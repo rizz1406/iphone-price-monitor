@@ -2,6 +2,33 @@
   "pincode": "500055",
   "currency": "INR",
   "assumedExchangeValue": 6550,
+  "worthWaitingSavings": 4000,
+  "saleCalendar": [
+    {
+      "name": "Christmas / Year-End Sale",
+      "start": "2026-12-20",
+      "end": "2027-01-01",
+      "expectedListPrice": 89999,
+      "historicalDropPct": 0.05,
+      "note": "Apple phones typically drop ~5% below current list; net ~₹81,000-84,000 with bank offer + exchange"
+    },
+    {
+      "name": "Republic Day Sale",
+      "start": "2027-01-17",
+      "end": "2027-01-26",
+      "expectedListPrice": 84999,
+      "historicalDropPct": 0.1,
+      "note": "Apple phones typically drop ~10% below current list; net ~₹72,000-78,000 with SBI ₹7,041 + M35 exchange ₹6,550"
+    },
+    {
+      "name": "Valentine's Day Sale",
+      "start": "2027-02-10",
+      "end": "2027-02-16",
+      "expectedListPrice": 84999,
+      "historicalDropPct": 0.1,
+      "note": "Usually matches Republic Day pricing; backup window"
+    }
+  ],
   "sites": [
     {
       "id": "flipkart",
