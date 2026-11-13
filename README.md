@@ -1,5 +1,7 @@
 # iPhone 17 Price & Offer Monitor (Pincode 500055)
 
+**🌐 Live Dashboard:** https://rizz1406.github.io/iphone-price-monitor/dashboard.html
+
 Automated Playwright pipeline monitoring **iPhone 17 256GB Mist Blue** prices, instant bank discounts, exchange ceilings, seller info, and delivery availability across **Flipkart**, **Croma**, and **Vijay Sales** for pincode **500055**.
 
 ---
