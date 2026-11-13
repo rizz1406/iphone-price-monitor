@@ -7,6 +7,8 @@ const money = new Intl.NumberFormat('en-IN', {
   maximumFractionDigits: 0,
 });
 
+const pctStr = (pct) => `${(pct * 100).toFixed(1).replace(/\.0$/, '')}%`;
+
 const istTime = (iso) =>
   new Date(iso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
@@ -76,6 +78,28 @@ const lowestListRecorded = (historyEntries) => {
   return ok.length ? Math.min(...ok.map((entry) => entry.listPrice)) : null;
 };
 
+// Self-learning: once a sale window has started, the actual lowest list price recorded
+// during the window calibrates the drop estimate. Recorded history is the memory —
+// no config edits needed. Guesses only apply until real sale data exists.
+const learnedSaleData = (historyEntries, sale) => {
+  if (sale.active === false && sale.daysAway > 0) return null;
+  const windowEnd = sale.active ? Date.now() : sale.end.getTime();
+  const inWindow = historyEntries.filter(
+    (entry) => entry.status === 'ok' && entry.listPrice &&
+      new Date(entry.checkedAt).getTime() >= sale.start.getTime() &&
+      new Date(entry.checkedAt).getTime() <= windowEnd,
+  );
+  if (!inWindow.length) return null;
+  const observedMinList = Math.min(...inWindow.map((entry) => entry.listPrice));
+  const before = historyEntries.filter(
+    (entry) => entry.status === 'ok' && entry.listPrice &&
+      new Date(entry.checkedAt).getTime() < sale.start.getTime(),
+  );
+  const baseline = before.length ? Math.min(...before.map((entry) => entry.listPrice)) : null;
+  const observedDropPct = baseline && baseline > observedMinList ? 1 - observedMinList / baseline : null;
+  return { observedMinList, baseline, observedDropPct, samples: inWindow.length };
+};
+
 // Sales analyser: computes expected drop, predicted net, and a worth-waiting verdict.
 const analyseSales = (config, historyEntries, results, saleState) => {
   const best = bestBuyable(results);
@@ -85,13 +109,24 @@ const analyseSales = (config, historyEntries, results, saleState) => {
   const threshold = config.worthWaitingSavings ?? 4000;
 
   const analysed = saleState.all.map((sale) => {
-    // Expected list = lower of configured expectation and historical-depth drop off the current floor.
-    const fromDrop = floorList && sale.historicalDropPct
-      ? Math.round((floorList * (1 - sale.historicalDropPct)) / 100) * 100
-      : null;
-    const expectedList = [sale.expectedListPrice, fromDrop, currentBestList]
-      .filter((value) => value)
-      .sort((a, b) => a - b)[0] ?? sale.expectedListPrice;
+    const learned = learnedSaleData(historyEntries, sale);
+
+    let expectedList;
+    if (learned?.observedMinList) {
+      // Real sale data exists — the observed price IS ground truth. Never compound the
+      // learned drop % on top of it (that would double-count the discount).
+      expectedList = [sale.expectedListPrice, learned.observedMinList]
+        .filter((value) => value)
+        .sort((a, b) => a - b)[0];
+    } else {
+      // No sale-window data yet — predict from the configured drop % off the recorded floor.
+      const fromDrop = floorList && sale.historicalDropPct
+        ? Math.round((floorList * (1 - sale.historicalDropPct)) / 100) * 100
+        : null;
+      expectedList = [sale.expectedListPrice, fromDrop, currentBestList]
+        .filter((value) => value)
+        .sort((a, b) => a - b)[0] ?? sale.expectedListPrice;
+    }
 
     // Predicted net subtracts only instant (full-payment) bank offers — EMI-only offers don't reduce the price you pay upfront.
     const bank = best?.maxBankOffer && best.bankOfferKind !== 'emi' ? best.maxBankOffer : 0;
@@ -112,7 +147,7 @@ const analyseSales = (config, historyEntries, results, saleState) => {
       verdict = { kind: 'now', text: `NOT WORTH WAITING — current price already better (sale saves ~${money.format(savings)})` };
     }
 
-    return { ...sale, expectedList, predictedNet, savings, verdict };
+    return { ...sale, expectedList, predictedNet, savings, verdict, learned };
   });
 
   return {
@@ -216,13 +251,20 @@ export async function writeReports({ root, config, results, historyPath }) {
     `### 🛒 Sales Analyser`,
     `- Current best buyable: ${analysis.best ? `${analysis.best.name} net ${money.format(analysis.currentBestNet)}` : 'none yet'}`,
   );
+  const dropNote = (sale) => {
+    const pct = sale.learned?.observedDropPct ?? sale.historicalDropPct;
+    const tag = sale.learned?.observedDropPct != null
+      ? `**learned ${pctStr(pct)} from ${sale.learned.samples} scrapes**`
+      : pct ? `${pctStr(pct)} (estimate, self-calibrates when the sale starts)` : 'unknown';
+    return tag;
+  };
   if (analysis.active.length) {
     for (const sale of analysis.active) {
-      mdLines.push(`- 🔥 **SALE LIVE: ${sale.name}** (until ${istTime(sale.end.toISOString())}) — predicted net ~${money.format(sale.predictedNet)}. ${sale.note}`);
+      mdLines.push(`- 🔥 **SALE LIVE: ${sale.name}** (until ${istTime(sale.end.toISOString())}) — expected list ~${money.format(sale.expectedList)}, predicted net ~${money.format(sale.predictedNet)}. ${sale.note}`);
     }
   } else if (analysis.upcoming.length) {
     for (const sale of analysis.upcoming) {
-      mdLines.push(`- ${sale.verdict.kind === 'worth' ? '💰' : sale.verdict.kind === 'marginal' ? '🤔' : '✅'} **${sale.name}** (${sale.daysAway} days): predicted net ~${money.format(sale.predictedNet)} — **${sale.verdict.text}**`);
+      mdLines.push(`- ${sale.verdict.kind === 'worth' ? '💰' : sale.verdict.kind === 'marginal' ? '🤔' : '✅'} **${sale.name}** (${sale.daysAway} days): expected list ~${money.format(sale.expectedList)} · drop ${dropNote(sale)} · predicted net ~${money.format(sale.predictedNet)} — **${sale.verdict.text}**`);
     }
   } else {
     mdLines.push(`- No sale windows configured in config.json`);
@@ -301,6 +343,8 @@ export async function writeReports({ root, config, results, historyPath }) {
     th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); font-weight: 600; }
     .sale-active { color: var(--warning); font-weight: 600; }
+    .learned { color: var(--success); font-weight: 600; }
+    .est { color: var(--muted); font-size: 0.85em; }
     .low-record { color: var(--success); font-weight: 600; }
   </style>
 </head>
@@ -387,19 +431,26 @@ export async function writeReports({ root, config, results, historyPath }) {
     <h2>🛒 Sale Analyser — worth watching?</h2>
     <table>
       <thead>
-        <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
+        <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Drop Est.</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
       </thead>
       <tbody>
         ${analysis.all
           .map((sale) => {
             const active = sale.active;
             const daysAway = sale.daysAway;
+            const learned = sale.learned?.observedDropPct != null;
+            const dropCell = learned
+              ? `<span class="learned" title="Calibrated from ${sale.learned.samples} scrapes during the sale window (baseline list ₹${sale.learned.baseline?.toLocaleString('en-IN')})">📈 ${pctStr(sale.learned.observedDropPct)} learned</span>`
+              : sale.historicalDropPct
+                ? `${pctStr(sale.historicalDropPct)} <span class="est">(estimate)</span>`
+                : '<span class="est">—</span>';
             const verdictColor = { worth: 'var(--success)', marginal: 'var(--warning)', now: 'var(--success)', live: 'var(--warning)', unknown: 'var(--muted)' }[sale.verdict.kind] ?? 'var(--text)';
             return `
           <tr>
             <td><strong>${sale.name}</strong></td>
             <td>${sale.start} → ${sale.end}</td>
             <td class="${active ? 'sale-active' : ''}">${active ? '🔥 LIVE' : daysAway > 0 ? `in ${daysAway} days` : 'passed'}</td>
+            <td>${dropCell}</td>
             <td>${money.format(sale.expectedList)}</td>
             <td><strong>~${money.format(sale.predictedNet)}</strong></td>
             <td style="color:${verdictColor}; font-weight:600;">${sale.verdict.text}</td>
@@ -408,7 +459,7 @@ export async function writeReports({ root, config, results, historyPath }) {
           .join('')}
       </tbody>
     </table>
-    <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, historical-discount% applied to lowest recorded list). Predicted net subtracts the live bank offer + M35 exchange. "Worth waiting" = predicted net beats current best by the threshold.</p>
+    <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes (history.jsonl is the memory — no manual updates needed). Predicted net subtracts the live instant bank offer + M35 exchange. "Worth waiting" = predicted net beats current best by the threshold.</p>
   </section>
 
   <section>

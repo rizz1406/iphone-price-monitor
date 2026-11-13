@@ -1,5 +1,5 @@
 # 📱 iPhone 17 (256GB, Mist Blue) Price Report
-**Target Pincode:** `500055` | **Updated:** 13 Nov 2026, 8:54 pm IST
+**Target Pincode:** `500055` | **Updated:** 13 Nov 2026, 9:12 pm IST
 
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Exchange Ceiling | Net (w/ ₹6550 M35) | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -9,9 +9,9 @@
 
 ### 🛒 Sales Analyser
 - Current best buyable: Flipkart net ₹81,408
-- 💰 **Christmas / Year-End Sale** (37 days): predicted net ~₹65,209 — **WORTH WAITING — saves ~₹16,199**
-- 💰 **Republic Day Sale** (65 days): predicted net ~₹61,009 — **WORTH WAITING — saves ~₹20,399**
-- 💰 **Valentine's Day Sale** (89 days): predicted net ~₹61,009 — **WORTH WAITING — saves ~₹20,399**
+- 💰 **Christmas / Year-End Sale** (37 days): expected list ~₹78,800 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹65,209 — **WORTH WAITING — saves ~₹16,199**
+- 💰 **Republic Day Sale** (65 days): expected list ~₹74,600 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,009 — **WORTH WAITING — saves ~₹20,399**
+- 💰 **Valentine's Day Sale** (89 days): expected list ~₹74,600 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,009 — **WORTH WAITING — saves ~₹20,399**
 
 ### 🎯 Targets
 - **Flipkart:** List ≤ `₹84,999` | Net ≤ `₹74,000`

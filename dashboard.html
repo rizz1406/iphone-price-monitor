@@ -45,6 +45,8 @@
     th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); font-weight: 600; }
     .sale-active { color: var(--warning); font-weight: 600; }
+    .learned { color: var(--success); font-weight: 600; }
+    .est { color: var(--muted); font-size: 0.85em; }
     .low-record { color: var(--success); font-weight: 600; }
   </style>
 </head>
@@ -54,7 +56,7 @@
       <h1>iPhone 17 (256GB, Mist Blue) Price Monitor</h1>
       <div class="subtitle">Pincode: <strong>500055</strong> | Assumed M35 Exchange: <strong>₹6,550</strong> | Cards sorted by lowest price you can actually buy at</div>
     </div>
-    <div class="subtitle">Last updated: <strong>13 Nov 2026, 8:54 pm</strong> IST</div>
+    <div class="subtitle">Last updated: <strong>13 Nov 2026, 9:12 pm</strong> IST</div>
   </header>
 
   <div class="banner banner-info">💰 Christmas / Year-End Sale starts 20 Dec 2026, 12:00 am (37 days) — predicted net ~₹65,209 · <strong>WORTH WAITING — saves ~₹16,199</strong></div>
@@ -132,37 +134,40 @@
     <h2>🛒 Sale Analyser — worth watching?</h2>
     <table>
       <thead>
-        <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
+        <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Drop Est.</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
       </thead>
       <tbody>
         
           <tr>
             <td><strong>Christmas / Year-End Sale</strong></td>
-            <td>Sat Dec 19 2026 18:30:00 GMT+0000 (Coordinated Universal Time) → Fri Jan 01 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+            <td>Sun Dec 20 2026 00:00:00 GMT+0530 (India Standard Time) → Fri Jan 01 2027 23:59:59 GMT+0530 (India Standard Time)</td>
             <td class="">in 37 days</td>
+            <td>5% <span class="est">(estimate)</span></td>
             <td>₹78,800</td>
             <td><strong>~₹65,209</strong></td>
             <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹16,199</td>
           </tr>
           <tr>
             <td><strong>Republic Day Sale</strong></td>
-            <td>Sat Jan 16 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Jan 26 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+            <td>Sun Jan 17 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Jan 26 2027 23:59:59 GMT+0530 (India Standard Time)</td>
             <td class="">in 65 days</td>
+            <td>10% <span class="est">(estimate)</span></td>
             <td>₹74,600</td>
             <td><strong>~₹61,009</strong></td>
             <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹20,399</td>
           </tr>
           <tr>
             <td><strong>Valentine's Day Sale</strong></td>
-            <td>Tue Feb 09 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Feb 16 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+            <td>Wed Feb 10 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Feb 16 2027 23:59:59 GMT+0530 (India Standard Time)</td>
             <td class="">in 89 days</td>
+            <td>10% <span class="est">(estimate)</span></td>
             <td>₹74,600</td>
             <td><strong>~₹61,009</strong></td>
             <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹20,399</td>
           </tr>
       </tbody>
     </table>
-    <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, historical-discount% applied to lowest recorded list). Predicted net subtracts the live bank offer + M35 exchange. "Worth waiting" = predicted net beats current best by the threshold.</p>
+    <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes (history.jsonl is the memory — no manual updates needed). Predicted net subtracts the live instant bank offer + M35 exchange. "Worth waiting" = predicted net beats current best by the threshold.</p>
   </section>
 
   <section>
