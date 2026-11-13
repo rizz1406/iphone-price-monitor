@@ -1,74 +1,29 @@
 {
-  "updatedAt": "2026-11-13T13:08:09.286Z",
+  "updatedAt": "2026-11-13T14:59:47.942Z",
   "pincode": "500055",
   "sites": [
     {
       "site": "flipkart",
       "name": "Flipkart",
-      "checkedAt": "2026-11-13T13:07:45.048Z",
+      "checkedAt": "2026-11-13T14:58:52.137Z",
       "status": "ok",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
-      "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
-      "listPrice": 94999,
-      "effectivePrice": 87958,
-      "maxBankOffer": 7041,
-      "bankOffers": [
-        {
-          "bank": "ICICI",
-          "amount": 7041
-        },
-        {
-          "bank": "HDFC",
-          "amount": 7041
-        },
-        {
-          "bank": "SBI",
-          "amount": 7041
-        },
-        {
-          "bank": "Axis",
-          "amount": 7041
-        },
-        {
-          "bank": "IDFC First",
-          "amount": 7041
-        },
-        {
-          "bank": "Kotak",
-          "amount": 7041
-        },
-        {
-          "bank": "Yes",
-          "amount": 7041
-        },
-        {
-          "bank": "Flipkart Axis",
-          "amount": 7000
-        },
-        {
-          "bank": "Flipkart SBI",
-          "amount": 7000
-        },
-        {
-          "bank": "IndusInd",
-          "amount": 6650
-        },
-        {
-          "bank": "Bank of Baroda",
-          "amount": 5000
-        }
-      ],
+      "title": "",
+      "listPrice": null,
+      "effectivePrice": null,
+      "maxBankOffer": null,
+      "bankOffers": [],
       "bankOfferKind": "instant",
-      "exchangeCeiling": 78850,
+      "exchangeCeiling": null,
       "exchangeAvailable": true,
       "assumedExchangeValue": 6550,
-      "netWithExchange": 81408,
-      "seller": "Vision Star",
-      "delivery": "Sunday, 15 Nov",
+      "netWithExchange": null,
+      "seller": null,
+      "delivery": null,
       "inStock": true,
       "deliverable": true,
-      "cod": false,
-      "pincodeSet": true,
+      "cod": null,
+      "pincodeSet": false,
       "targets": {
         "listPrice": 84999,
         "effectivePrice": 80000,
@@ -78,7 +33,7 @@
     {
       "site": "croma",
       "name": "Croma",
-      "checkedAt": "2026-11-13T13:07:59.434Z",
+      "checkedAt": "2026-11-13T14:59:36.169Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -106,7 +61,7 @@
     {
       "site": "vijay-sales",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-13T13:08:08.809Z",
+      "checkedAt": "2026-11-13T14:59:47.821Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
