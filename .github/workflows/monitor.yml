@@ -3,7 +3,7 @@ name: iPhone 17 Price Monitor
 on:
   schedule:
     # Runs every 30 mins between 02:30 UTC (08:00 IST) and 17:30 UTC (23:00 IST)
-    - cron: '30/30 2-17 * * *'
+    - cron: '*/30 2-17 * * *'
   workflow_dispatch:
 
 permissions:
