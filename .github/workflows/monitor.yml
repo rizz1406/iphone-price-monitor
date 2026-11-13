@@ -2,8 +2,9 @@ name: iPhone 17 Price Monitor
 
 on:
   schedule:
-    # Runs every 30 mins between 02:30 UTC (08:00 IST) and 17:30 UTC (23:00 IST)
-    - cron: '*/30 2-17 * * *'
+    # Runs every 30 mins between 02:07 UTC (07:37 IST) and 17:37 UTC (23:07 IST).
+    # Off-peak minutes (7,37) — GitHub drops scheduled runs at the congested */30 marks.
+    - cron: '7,37 2-17 * * *'
   workflow_dispatch:
 
 permissions:

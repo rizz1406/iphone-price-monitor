@@ -342,10 +342,27 @@ export async function writeReports({ root, config, results, historyPath }) {
     table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
     th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); font-weight: 600; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-wrap table { min-width: 640px; }
     .sale-active { color: var(--warning); font-weight: 600; }
     .learned { color: var(--success); font-weight: 600; }
     .est { color: var(--muted); font-size: 0.85em; }
     .low-record { color: var(--success); font-weight: 600; }
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+      header { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+      h1 { font-size: 1.35rem; }
+      h2 { font-size: 1.1rem; }
+      .grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+      .card { padding: 1.15rem; }
+      .price-main { font-size: 1.55rem; }
+      .card-title { font-size: 1.05rem; }
+      .banner { padding: 0.75rem 1rem; font-size: 0.88rem; }
+      section { padding: 1rem; margin-bottom: 1.25rem; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 0.55rem 0.5rem; }
+      .rec { font-size: 0.82rem; }
+    }
   </style>
 </head>
 <body>
@@ -429,6 +446,7 @@ export async function writeReports({ root, config, results, historyPath }) {
 
   <section>
     <h2>🛒 Sale Analyser — worth watching?</h2>
+    <div class="table-wrap">
     <table>
       <thead>
         <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Drop Est.</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
@@ -459,11 +477,13 @@ export async function writeReports({ root, config, results, historyPath }) {
           .join('')}
       </tbody>
     </table>
+    </div>
     <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes (history.jsonl is the memory — no manual updates needed). Predicted net subtracts the live instant bank offer + M35 exchange. "Worth waiting" = predicted net beats current best by the threshold.</p>
   </section>
 
   <section>
     <h2>📊 Recent Scrapes (newest first)</h2>
+    <div class="table-wrap">
     <table>
       <thead>
         <tr><th>Time (IST)</th><th>Site</th><th>Status</th><th>List</th><th>Effective</th><th>Net w/ Exchange</th></tr>
@@ -486,6 +506,7 @@ export async function writeReports({ root, config, results, historyPath }) {
           .join('')}
       </tbody>
     </table>
+    </div>
   </section>
 </body>
 </html>`;
