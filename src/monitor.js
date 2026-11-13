@@ -66,6 +66,16 @@ const getOffer = (product) => {
   return offers ?? null;
 };
 
+const offerPrice = (offer) => {
+  if (!offer) return null;
+  return (
+    toNumber(offer.price) ??
+    toNumber(offer.lowPrice) ??
+    toNumber(offer.priceSpecification?.price) ??
+    null
+  );
+};
+
 const parseBanks = (text) => {
   const section = text.match(/Bank offers([\s\S]*?)(?:View EMI offers|View non-EMI offers|Additional benefits)/i)?.[1] ?? text;
   const pattern = /₹([\d,]+)\s*off[\s\S]{0,100}?(Flipkart SBI|Flipkart Axis|ICICI|HDFC|SBI|Axis|Bank of Baroda|IDFC First|Kotak|Yes|IndusInd)\b/gi;
@@ -139,9 +149,10 @@ const extractFlipkart = async (page, site) => {
   const bankOffers = parseBanks(text);
   const maxBankOffer = bankOffers[0]?.amount ?? null;
   const listPrice =
-    toNumber(offer?.price) ??
+    offerPrice(offer) ??
     toNumber(text.match(/(\d+)%\s*\n\s*[\d,]+\s*\n\s*₹([\d,]+)/)?.[2]) ??
     toNumber(text.match(/₹([\d,]+)/)?.[1]);
+  if (!listPrice) throw new Error('Could not extract Flipkart price (page may be bot-walled or not fully loaded)');
   const effectivePrice =
     toNumber(text.match(/Buy at ₹([\d,]+)/i)?.[1]) ??
     (listPrice && maxBankOffer ? Math.max(0, listPrice - maxBankOffer) : listPrice);
@@ -213,7 +224,7 @@ const extractCroma = async (page, site) => {
   text = await page.locator('body').innerText();
   const product = await getProductJsonLd(page);
   const offer = getOffer(product);
-  const listPrice = toNumber(offer?.price) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
+  const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Croma price');
   const deliverable = !/Not Available for your pincode/i.test(text);
 
@@ -258,7 +269,7 @@ const extractVijay = async (page, site) => {
   }
   const product = await getProductJsonLd(page);
   const offer = getOffer(product);
-  const listPrice = toNumber(offer?.price) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
+  const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Vijay Sales price');
   const bankOffers = parseVijayOffers(text);
   const maxBankOffer = bankOffers[0]?.amount ?? null;

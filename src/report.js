@@ -123,6 +123,12 @@ export async function writeReports({ root, config, results, historyPath }) {
     ${results
       .map((r) => {
         if (r.status === 'error') {
+          const lastGood = [...historyEntries]
+            .reverse()
+            .find((entry) => entry.site === r.site && entry.status === 'ok' && entry.effectivePrice);
+          const lastGoodTime = lastGood
+            ? new Date(lastGood.checkedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })
+            : null;
           return `
           <div class="card">
             <div>
@@ -131,6 +137,29 @@ export async function writeReports({ root, config, results, historyPath }) {
                 <span class="badge badge-error">ERROR</span>
               </div>
               <p style="color:var(--error); font-size:0.9rem;">${r.error}</p>
+              ${
+                lastGood
+                  ? `
+              <div class="price-main">${money.format(lastGood.effectivePrice)}</div>
+              <div class="price-sub">Last known good scrape: <strong>${lastGoodTime}</strong> (IST)</div>
+              <div class="detail-row">
+                <span class="detail-label">List Price</span>
+                <span class="detail-value">${lastGood.listPrice ? money.format(lastGood.listPrice) : 'N/A'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Best Bank Offer</span>
+                <span class="detail-value">${lastGood.maxBankOffer ? money.format(lastGood.maxBankOffer) : 'None'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Net w/ Exchange</span>
+                <span class="detail-value" style="color:var(--success); font-weight:700;">${lastGood.netWithExchange ? money.format(lastGood.netWithExchange) : 'N/A'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Delivery</span>
+                <span class="detail-value">${lastGood.delivery ?? 'N/A'}</span>
+              </div>`
+                  : '<p style="color:var(--muted); font-size:0.9rem;">No successful scrape recorded yet.</p>'
+              }
             </div>
             <a href="${r.url}" target="_blank" class="btn">View Store</a>
           </div>`;
