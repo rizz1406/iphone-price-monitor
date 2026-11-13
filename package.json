@@ -1,0 +1,14 @@
+{
+  "name": "iphone-price-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "monitor": "node --env-file-if-exists=.env src/monitor.js",
+    "monitor:summary": "node --env-file-if-exists=.env src/monitor.js --summary",
+    "dashboard": "node --env-file-if-exists=.env src/report.js"
+  },
+  "dependencies": {
+    "playwright": "1.65.0"
+  }
+}

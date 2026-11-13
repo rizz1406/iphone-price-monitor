@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/errors/
+data/debug-*.txt
+inspect-*.mjs
+*.png
+.vscode/
+.playwright-cli/

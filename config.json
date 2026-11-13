@@ -1,0 +1,38 @@
+{
+  "pincode": "500055",
+  "currency": "INR",
+  "assumedExchangeValue": 6550,
+  "sites": [
+    {
+      "id": "flipkart",
+      "name": "Flipkart",
+      "type": "flipkart",
+      "enabled": true,
+      "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
+      "targetListPrice": 84999,
+      "targetEffectivePrice": 80000,
+      "targetNetWithExchange": 74000
+    },
+    {
+      "id": "croma",
+      "name": "Croma",
+      "type": "croma",
+      "enabled": true,
+      "headed": true,
+      "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
+      "targetListPrice": 82900,
+      "targetEffectivePrice": 82900,
+      "targetNetWithExchange": 76400
+    },
+    {
+      "id": "vijay-sales",
+      "name": "Vijay Sales",
+      "type": "vijay",
+      "enabled": true,
+      "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
+      "targetListPrice": 84999,
+      "targetEffectivePrice": 84999,
+      "targetNetWithExchange": 78449
+    }
+  ]
+}
