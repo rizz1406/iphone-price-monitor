@@ -1,5 +1,5 @@
 # 📱 iPhone 17 (256GB, Mist Blue) Price Report
-**Target Pincode:** `500055` | **Updated:** 15 Nov 2026, 2:21 am IST
+**Target Pincode:** `500055` | **Updated:** 15 Nov 2026, 2:52 am IST
 
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Exchange Ceiling | Net (w/ ₹6550 M35) | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
