@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-11-14T08:11:40.659Z",
+  "updatedAt": "2026-11-14T08:42:15.438Z",
   "pincode": "500055",
   "sites": [
     {
       "site": "flipkart",
       "name": "Flipkart",
-      "checkedAt": "2026-11-14T08:11:16.407Z",
+      "checkedAt": "2026-11-14T08:41:51.542Z",
       "status": "ok",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
       "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
@@ -78,7 +78,7 @@
     {
       "site": "croma",
       "name": "Croma",
-      "checkedAt": "2026-11-14T08:11:28.938Z",
+      "checkedAt": "2026-11-14T08:42:03.776Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -106,7 +106,7 @@
     {
       "site": "vijay-sales",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-14T08:11:40.521Z",
+      "checkedAt": "2026-11-14T08:42:15.320Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
