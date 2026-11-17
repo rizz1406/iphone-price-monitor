@@ -7,7 +7,7 @@
       "id": "iphone17",
       "name": "iPhone 17 256GB Mist Blue",
       "shortName": "iPhone 17",
-      "assumedExchangeValue": 6550,
+      "assumedExchangeValue": 5000,
       "saleCalendar": [
         {
           "name": "Christmas / Year-End Sale",
@@ -23,7 +23,7 @@
           "end": "2027-01-26",
           "expectedListPrice": 84999,
           "historicalDropPct": 0.1,
-          "note": "Apple phones typically drop ~10% below current list; net ~₹72,000-78,000 with SBI ₹7,041 + M35 exchange ₹6,550"
+          "note": "Apple phones typically drop ~10% below current list; net ~₹72,000-78,000 with SBI ₹7,041 + M35 exchange ₹5,000"
         },
         {
           "name": "Valentine's Day Sale",
@@ -65,6 +65,17 @@
           "targetListPrice": 84999,
           "targetEffectivePrice": 84999,
           "targetNetWithExchange": 78449
+        },
+        {
+          "id": "amazon",
+          "name": "Amazon",
+          "type": "amazon",
+          "enabled": true,
+          "headed": true,
+          "url": "https://www.amazon.in/dp/B0FQFYXCC4",
+          "targetListPrice": 89999,
+          "targetEffectivePrice": 89900,
+          "targetNetWithExchange": 79900
         }
       ]
     },
@@ -107,6 +118,17 @@
           "enabled": true,
           "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
           "targetListPrice": 85999,
+          "targetEffectivePrice": 83999,
+          "targetNetWithExchange": 83999
+        },
+        {
+          "id": "amazon",
+          "name": "Amazon",
+          "type": "amazon",
+          "enabled": true,
+          "headed": true,
+          "url": "https://www.amazon.in/dp/B0GL87VP7N",
+          "targetListPrice": 99999,
           "targetEffectivePrice": 83999,
           "targetNetWithExchange": 83999
         }

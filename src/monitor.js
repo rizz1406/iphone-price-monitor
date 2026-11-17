@@ -25,6 +25,15 @@ const toNumber = (value) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 };
 
+// Handles "₹92,900.00" style strings that toNumber's digit-strip would turn into 9290000.
+const parseInr = (value) => {
+  if (!value) return null;
+  const match = String(value).replace(/₹/g, '').trim().match(/^([\d,]+(?:\.\d+)?)$/);
+  if (!match) return null;
+  const parsed = parseFloat(match[1].replace(/,/g, ''));
+  return Number.isFinite(parsed) && parsed > 0 ? Math.round(parsed) : null;
+};
+
 const findProduct = (node) => {
   if (!node || typeof node !== 'object') return null;
   if (Array.isArray(node)) {
@@ -312,10 +321,83 @@ const extractVijay = async (page, site, product) => {
   };
 };
 
+const extractAmazon = async (page, site, product) => {
+  const gotoWithRetry = async () => {
+    try {
+      await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    } catch {
+      await page.waitForTimeout(8000);
+      await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    }
+  };
+  await gotoWithRetry();
+  await page.waitForTimeout(5000);
+  let text = await page.locator('body').innerText().catch(() => '');
+  if (/Enter the characters you see below|Robot Check|Type the characters/i.test(text)) {
+    throw new Error('Amazon blocked the request (captcha / bot check)');
+  }
+  if (/Continue shopping/i.test(text)) {
+    const btn = page
+      .locator('button:has-text("Continue shopping"), input[value="Continue shopping"], a:has-text("Continue shopping")')
+      .first();
+    await btn.click({ timeout: 5000 }).catch(() => {});
+    await page.waitForLoadState('domcontentloaded', { timeout: 20000 }).catch(() => {});
+    await page.waitForTimeout(3000);
+    await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.waitForTimeout(6000);
+  }
+  text = await page.locator('body').innerText().catch(() => '');
+  const jsonLd = await getProductJsonLd(page);
+  const offer = getOffer(jsonLd);
+  const domPrice =
+    parseInr(
+      await page.locator('#corePrice_feature_div .a-offscreen').first().innerText({ timeout: 4000 }).catch(() => null)
+    ) ??
+    parseInr(
+      await page.locator('#apex_desktop .a-price-whole').first().innerText({ timeout: 4000 }).catch(() => null)
+    );
+  const listPrice = offerPrice(offer) ?? domPrice ?? toNumber(text.match(/₹\s?([\d,]+)/)?.[1]);
+  if (!listPrice) throw new Error('Could not extract Amazon price');
+  const inStock = /In stock/i.test(text) || (await page.locator('#add-to-cart-button').count()) > 0;
+  const exchangeCeiling = toNumber(text.match(/up to ₹\s?([\d,]+)(?:\.00)?\s*off/i)?.[1]) ?? null;
+
+  return {
+    site: site.id,
+    product: product.id,
+    productName: product.name,
+    name: site.name,
+    checkedAt: new Date().toISOString(),
+    status: 'ok',
+    url: site.url,
+    title: await page.locator('#productTitle').first().innerText().catch(() => jsonLd?.name ?? ''),
+    listPrice,
+    effectivePrice: listPrice,
+    maxBankOffer: null,
+    bankOffers: [],
+    bankOfferKind: 'none',
+    exchangeCeiling,
+    exchangeAvailable: false,
+    assumedExchangeValue: product.assumedExchangeValue,
+    netWithExchange: listPrice,
+    seller: text.match(/Sold by\s*([^\n]+)/i)?.[1]?.trim() ?? 'Amazon',
+    delivery: text.match(/(?:FREE delivery|Delivery)[^\n]*([A-Z][a-z]+,?\s+\d+\s+[A-Z]+)/)?.[1]?.trim() ?? null,
+    inStock,
+    deliverable: inStock,
+    cod: null,
+    pincodeSet: false,
+    targets: {
+      listPrice: site.targetListPrice,
+      effectivePrice: site.targetEffectivePrice,
+      netWithExchange: site.targetNetWithExchange,
+    },
+  };
+};
+
 const extractors = {
   flipkart: extractFlipkart,
   croma: extractCroma,
   vijay: extractVijay,
+  amazon: extractAmazon,
 };
 
 const resultKey = (result) => `${result.product ?? 'iphone17'}:${result.site}`;

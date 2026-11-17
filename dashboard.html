@@ -7,47 +7,155 @@
   <title>Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26</title>
   <style>
     :root {
-      --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8;
-      --accent: #38bdf8; --success: #22c55e; --error: #ef4444; --warning: #f59e0b;
+      --text: #f1f5f9; --muted: #9aa8bd;
+      --accent: #7dd3fc; --success: #4ade80; --error: #f87171; --warning: #fbbf24;
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-strong: rgba(255, 255, 255, 0.09);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.18);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 2rem; max-width: 1200px; margin: 0 auto; }
-    header { margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end; }
-    h1 { font-size: 1.75rem; font-weight: 700; }
+    body {
+      color: var(--text); padding: 2rem; max-width: 1200px; margin: 0 auto;
+      background:
+        radial-gradient(1100px 600px at 8% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+        radial-gradient(900px 550px at 95% 0%, rgba(168, 85, 247, 0.14), transparent 55%),
+        radial-gradient(1000px 700px at 50% 115%, rgba(45, 212, 191, 0.12), transparent 60%),
+        linear-gradient(180deg, #0b1020 0%, #0e1526 45%, #0b1220 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(420px 420px at 85% 25%, rgba(99, 102, 241, 0.10), transparent 65%),
+        radial-gradient(520px 520px at 12% 70%, rgba(20, 184, 166, 0.09), transparent 65%);
+      animation: drift 26s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to   { transform: translate3d(-3%, 4%, 0) scale(1.06); }
+    }
+    @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+    header {
+      margin-bottom: 1.5rem; padding-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: flex-end;
+      background: linear-gradient(160deg, var(--glass-strong), var(--glass));
+      border: 1px solid var(--glass-border); border-radius: 1.25rem; padding: 1.25rem 1.5rem;
+      backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+      box-shadow: 0 8px 32px rgba(2, 6, 23, 0.45), inset 0 1px 0 var(--glass-highlight);
+    }
+    h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
     h2 { font-size: 1.25rem; margin-bottom: 1rem; }
-    .product-heading { margin: 2.25rem 0 1rem; font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-    .primary-tag, .watch-tag { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 9999px; vertical-align: middle; }
-    .primary-tag { background: rgba(245, 158, 11, 0.25); color: var(--warning); }
-    .watch-tag { background: rgba(148, 163, 184, 0.15); color: var(--muted); }
+    .product-heading {
+      margin: 2.25rem 0 1rem; font-size: 1.4rem; padding: 0.75rem 1.25rem; border-radius: 1rem;
+      background: linear-gradient(120deg, rgba(125, 211, 252, 0.10), rgba(168, 85, 247, 0.08));
+      border: 1px solid var(--glass-border); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: inset 0 1px 0 var(--glass-highlight);
+    }
+    .primary-tag, .watch-tag { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 9999px; vertical-align: middle; backdrop-filter: blur(6px); }
+    .primary-tag { background: rgba(251, 191, 36, 0.18); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.35); }
+    .watch-tag { background: rgba(148, 163, 184, 0.12); color: var(--muted); border: 1px solid rgba(148, 163, 184, 0.25); }
     .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
-    .banner { padding: 0.85rem 1.25rem; border-radius: 0.75rem; margin-bottom: 1.25rem; font-size: 0.95rem; }
-    .banner-sale { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); color: var(--warning); }
-    .banner-info { background: rgba(56, 189, 248, 0.12); border: 1px solid var(--accent); color: var(--accent); }
-    .banner-drop { background: rgba(34, 197, 94, 0.12); border: 1px solid var(--success); color: var(--success); }
-    .badge { padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
-    .badge-ok { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-    .badge-error { background: rgba(239, 68, 68, 0.2); color: var(--error); }
-    .badge-best { background: rgba(245, 158, 11, 0.25); color: var(--warning); }
+    .banner {
+      padding: 0.85rem 1.25rem; border-radius: 1rem; margin-bottom: 1.25rem; font-size: 0.95rem;
+      backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%);
+      box-shadow: 0 6px 24px rgba(2, 6, 23, 0.35), inset 0 1px 0 var(--glass-highlight);
+    }
+    .banner-sale { background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.4); color: var(--warning); }
+    .banner-info { background: rgba(125, 211, 252, 0.10); border: 1px solid rgba(125, 211, 252, 0.35); color: var(--accent); }
+    .banner-drop { background: rgba(74, 222, 128, 0.10); border: 1px solid rgba(74, 222, 128, 0.35); color: var(--success); }
+    .badge { padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; backdrop-filter: blur(6px); }
+    .badge-ok { background: rgba(74, 222, 128, 0.14); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.3); }
+    .badge-error { background: rgba(248, 113, 113, 0.14); color: var(--error); border: 1px solid rgba(248, 113, 113, 0.3); }
+    .badge-best { background: rgba(251, 191, 36, 0.16); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.35); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-best { border-color: var(--warning); box-shadow: 0 0 0 1px var(--warning); }
+    .card {
+      background: linear-gradient(155deg, var(--glass-strong) 0%, var(--glass) 55%, rgba(255,255,255,0.03) 100%);
+      border: 1px solid var(--glass-border); border-radius: 1.25rem; padding: 1.5rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
+      box-shadow: 0 10px 34px rgba(2, 6, 23, 0.45), inset 0 1px 0 var(--glass-highlight);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 16px 44px rgba(2, 6, 23, 0.55), inset 0 1px 0 var(--glass-highlight);
+    }
+    .card-best {
+      border-color: rgba(251, 191, 36, 0.55);
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.35), 0 10px 34px rgba(2, 6, 23, 0.45), inset 0 1px 0 var(--glass-highlight);
+      background: linear-gradient(155deg, rgba(251, 191, 36, 0.10) 0%, var(--glass) 60%);
+    }
     .card-header { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .card-title { font-size: 1.2rem; font-weight: 600; color: var(--accent); }
-    .price-main { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .price-main { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; text-shadow: 0 0 24px rgba(125, 211, 252, 0.25); }
     .price-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
-    .rec { padding: 0.6rem 0.75rem; border-radius: 0.5rem; font-size: 0.85rem; margin: 0.9rem 0; }
-    .rec-buy { background: rgba(34, 197, 94, 0.12); border: 1px solid var(--success); color: var(--success); }
-    .rec-wait { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--accent); color: var(--accent); }
-    .rec-watch { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); color: var(--warning); }
-    .detail-row { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .rec { padding: 0.6rem 0.8rem; border-radius: 0.75rem; font-size: 0.85rem; margin: 0.9rem 0; backdrop-filter: blur(8px); }
+    .rec-buy { background: rgba(74, 222, 128, 0.10); border: 1px solid rgba(74, 222, 128, 0.35); color: var(--success); }
+    .rec-wait { background: rgba(125, 211, 252, 0.08); border: 1px solid rgba(125, 211, 252, 0.3); color: var(--accent); }
+    .rec-watch { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3); color: var(--warning); }
+    .detail-row { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .detail-row:last-child { border-bottom: none; }
     .detail-label { color: var(--muted); white-space: nowrap; }
     .detail-value { font-weight: 500; text-align: right; }
-    .btn { display: inline-block; width: 100%; text-align: center; padding: 0.6rem; margin-top: 1.25rem; background: #2563eb; color: #fff; text-decoration: none; border-radius: 0.5rem; font-weight: 600; }
-    .btn:hover { background: #1d4ed8; }
-    section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-wrap { position: relative; margin: 0.85rem 0 0.35rem; cursor: crosshair; }
+    .chart-wrap svg { display: block; width: 100%; height: 64px; }
+    .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: chart-draw 1.4s cubic-bezier(.4,0,.2,1) forwards; }
+    [data-variant="success"] .chart-line { stroke: var(--success); }
+    [data-variant="error"] .chart-line { stroke: var(--error); }
+    [data-variant="success"] .chart-stop-hi { stop-color: var(--success); }
+    [data-variant="success"] .chart-stop-lo { stop-color: var(--success); }
+    [data-variant="error"] .chart-stop-hi { stop-color: var(--error); }
+    [data-variant="error"] .chart-stop-lo { stop-color: var(--error); }
+    .chart-area { opacity: 0; animation: chart-fade 0.9s ease 0.55s forwards; }
+    .chart-grid { stroke: rgba(255,255,255,0.08); stroke-width: 1; stroke-dasharray: 3 4; }
+    .chart-dot { stroke: rgba(10, 16, 32, 0.9); stroke-width: 1.5; opacity: 0; animation: chart-fade 0.5s ease 1s forwards; }
+    .chart-dot[data-cls="lo"] { fill: var(--success); }
+    .chart-dot[data-cls="hi"] { fill: var(--error); }
+    .chart-cross { stroke: rgba(255,255,255,0.35); stroke-width: 1; stroke-dasharray: 2 3; transition: x 0.08s ease; }
+    .chart-hover-dot { fill: #fff; stroke: rgba(10,16,32,0.9); stroke-width: 1.5; filter: drop-shadow(0 0 6px rgba(125,211,252,0.8)); transition: cx 0.08s ease, cy 0.08s ease; }
+    .chart-tip {
+      position: absolute; pointer-events: none; opacity: 0; z-index: 6;
+      transform: translate(-50%, calc(-100% - 14px));
+      background: rgba(8, 13, 26, 0.88); color: var(--text);
+      border: 1px solid var(--glass-border); border-radius: 0.7rem;
+      padding: 0.45rem 0.65rem; font-size: 0.72rem; line-height: 1.35; white-space: nowrap;
+      backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%);
+      box-shadow: 0 8px 24px rgba(2, 6, 23, 0.6), inset 0 1px 0 var(--glass-highlight);
+      transition: opacity 0.15s ease, left 0.08s ease, top 0.08s ease;
+    }
+    .chart-wrap:hover .chart-tip { opacity: 1; }
+    .chart-tip .tip-price { font-weight: 700; font-size: 0.82rem; }
+    .chart-tip .tip-delta-down { color: var(--success); }
+    .chart-tip .tip-delta-up { color: var(--error); }
+    @keyframes chart-draw { to { stroke-dashoffset: 0; } }
+    @keyframes chart-fade { to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .chart-line { animation: none; stroke-dashoffset: 0; }
+      .chart-area, .chart-dot { animation: none; opacity: 1; }
+    }
+    .btn {
+      display: inline-block; width: 100%; text-align: center; padding: 0.65rem; margin-top: 1.25rem;
+      color: #eaf6ff; text-decoration: none; border-radius: 0.85rem; font-weight: 600;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(99, 102, 241, 0.35));
+      border: 1px solid rgba(125, 211, 252, 0.45);
+      backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.18), inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(56, 189, 248, 0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
+    section {
+      background: linear-gradient(155deg, var(--glass-strong), var(--glass));
+      border: 1px solid var(--glass-border); border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 2rem;
+      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      box-shadow: 0 8px 32px rgba(2, 6, 23, 0.4), inset 0 1px 0 var(--glass-highlight);
+    }
     table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
-    th, td { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+    th, td { padding: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
     th { color: var(--muted); font-weight: 600; }
+    tbody tr { transition: background 0.2s ease; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .table-wrap table { min-width: 640px; }
     .sale-active { color: var(--warning); font-weight: 600; }
@@ -56,10 +164,10 @@
     .low-record { color: var(--success); font-weight: 600; }
     @media (max-width: 640px) {
       body { padding: 1rem; }
-      header { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+      header { flex-direction: column; align-items: flex-start; gap: 0.4rem; padding: 1rem 1.15rem; }
       h1 { font-size: 1.35rem; }
       h2 { font-size: 1.1rem; }
-      .product-heading { font-size: 1.15rem; }
+      .product-heading { font-size: 1.15rem; padding: 0.65rem 1rem; }
       .grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
       .card { padding: 1.15rem; }
       .price-main { font-size: 1.55rem; }
@@ -76,12 +184,12 @@
   <header>
     <div>
       <h1>📱 Price Monitor — iPhone 17 · Galaxy S25 · S26</h1>
-      <div class="subtitle">Pincode: <strong>500055</strong> | iPhone net assumes M35 exchange <strong>₹6,550</strong> | Cards sorted by lowest price you can actually buy at</div>
+      <div class="subtitle">Pincode: <strong>500055</strong> | iPhone net assumes M35 exchange <strong>₹5,000</strong> | Cards sorted by lowest price you can actually buy at</div>
     </div>
-    <div class="subtitle">Last updated: <strong>17 Nov 2026, 9:31 pm</strong> IST</div>
+    <div class="subtitle">Last updated: <strong>17 Nov 2026, 9:46 pm</strong> IST</div>
   </header>
 
-  <div class="banner banner-info">💰 Christmas / Year-End Sale starts 20 Dec 2026, 12:00 am (33 days) — iPhone 17 predicted net ~₹58,750 · <strong>WORTH WAITING — saves ~₹19,800</strong></div>
+  <div class="banner banner-info">💰 Christmas / Year-End Sale starts 20 Dec 2026, 12:00 am (33 days) — iPhone 17 predicted net ~₹60,300 · <strong>WORTH WAITING — saves ~₹19,800</strong></div>
   
   
     <h2 class="product-heading">📱 iPhone 17 256GB Mist Blue <span class="primary-tag">your target</span></h2>
@@ -98,11 +206,27 @@
             </div>
             <div class="price-main">₹85,100</div>
             <div class="price-sub">List: ₹89,100 | Trend: ▼ falling | Lowest recorded: <span class="low-record">₹84,900</span> on 17 Nov 2026, 7:13 pm</div>
-            <svg width="260" height="44" viewBox="0 0 260 44" style="display:block;margin:0.75rem 0 0;">
-    <polyline fill="none" stroke="var(--success)" stroke-width="2" points="2.0,6.0 13.1,6.0 24.3,6.0 35.4,6.0 46.5,6.0 57.7,6.0 68.8,6.0 79.9,6.0 91.0,6.0 102.2,6.0 113.3,6.0 124.4,6.0 135.6,6.0 146.7,6.0 157.8,6.0 169.0,6.0 180.1,6.0 191.2,6.0 202.3,38.0 213.5,35.9 224.6,35.9 235.7,35.9 246.9,35.9 258.0,35.9" />
-  </svg>
-            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹58,750 (saves ~₹19,800)</div>
-            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹78,550</span></div>
+            
+        <div class="chart-wrap" data-points="[[8,16,87958,&quot;2026-11-13T12:07:54.937Z&quot;],[20.3,16,87958,&quot;2026-11-13T12:11:00.631Z&quot;],[32.7,16,87958,&quot;2026-11-13T12:17:40.481Z&quot;],[45,16,87958,&quot;2026-11-13T12:19:25.997Z&quot;],[57.4,16,87958,&quot;2026-11-13T12:21:33.521Z&quot;],[69.7,16,87958,&quot;2026-11-13T12:26:16.601Z&quot;],[82.1,16,87958,&quot;2026-11-13T12:27:37.676Z&quot;],[94.4,16,87958,&quot;2026-11-13T12:28:56.117Z&quot;],[106.8,16,87958,&quot;2026-11-13T12:30:09.649Z&quot;],[119.1,16,87958,&quot;2026-11-13T12:31:27.369Z&quot;],[131.5,16,87958,&quot;2026-11-13T12:36:31.827Z&quot;],[143.8,16,87958,&quot;2026-11-13T12:43:38.287Z&quot;],[156.2,16,87958,&quot;2026-11-13T13:02:04.887Z&quot;],[168.5,16,87958,&quot;2026-11-13T13:07:45.048Z&quot;],[180.9,16,87958,&quot;2026-11-13T15:16:29.124Z&quot;],[193.2,16,87958,&quot;2026-11-13T15:24:07.447Z&quot;],[205.6,16,87958,&quot;2026-11-13T15:43:28.493Z&quot;],[217.9,16,87958,&quot;2026-11-13T20:26:47.402Z&quot;],[230.3,78,84900,&quot;2026-11-17T13:43:38.788Z&quot;],[242.6,73.9,85100,&quot;2026-11-17T13:46:14.777Z&quot;],[255,73.9,85100,&quot;2026-11-17T14:26:34.144Z&quot;],[267.3,73.9,85100,&quot;2026-11-17T15:38:30.949Z&quot;],[279.7,73.9,85100,&quot;2026-11-17T16:04:21.251Z&quot;],[292,73.9,85100,&quot;2026-11-17T16:15:04.017Z&quot;]]" data-variant="success">
+          <svg viewBox="0 0 300 96" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+            <defs>
+              <linearGradient id="fill-iphone17-flipkart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="chart-grid" x1="0" y1="78" x2="300" y2="78"/>
+            <path class="chart-area" d="M 8 16 C 12.1 16.0, 16.2 16.0, 20.3 16 C 26.5 16.0, 26.5 16.0, 32.7 16 C 38.9 16.0, 38.8 16.0, 45 16 C 51.2 16.0, 51.2 16.0, 57.4 16 C 63.6 16.0, 63.5 16.0, 69.7 16 C 75.9 16.0, 75.9 16.0, 82.1 16 C 88.3 16.0, 88.2 16.0, 94.4 16 C 100.6 16.0, 100.6 16.0, 106.8 16 C 113.0 16.0, 112.9 16.0, 119.1 16 C 125.3 16.0, 125.3 16.0, 131.5 16 C 137.7 16.0, 137.6 16.0, 143.8 16 C 150.0 16.0, 150.0 16.0, 156.2 16 C 162.4 16.0, 162.3 16.0, 168.5 16 C 174.7 16.0, 174.7 16.0, 180.9 16 C 187.1 16.0, 187.0 16.0, 193.2 16 C 199.4 16.0, 199.4 16.0, 205.6 16 C 211.8 26.3, 211.7 5.7, 217.9 16 C 224.1 25.6, 224.1 68.3, 230.3 78 C 236.5 87.7, 236.4 64.3, 242.6 73.9 C 248.8 73.2, 248.8 74.6, 255 73.9 C 261.2 73.9, 261.1 73.9, 267.3 73.9 C 273.5 73.9, 273.5 73.9, 279.7 73.9 C 283.8 73.9, 287.9 73.9, 292 73.9 L 292 78 L 8 78 Z" fill="url(#fill-iphone17-flipkart)"/>
+            <path class="chart-line" d="M 8 16 C 12.1 16.0, 16.2 16.0, 20.3 16 C 26.5 16.0, 26.5 16.0, 32.7 16 C 38.9 16.0, 38.8 16.0, 45 16 C 51.2 16.0, 51.2 16.0, 57.4 16 C 63.6 16.0, 63.5 16.0, 69.7 16 C 75.9 16.0, 75.9 16.0, 82.1 16 C 88.3 16.0, 88.2 16.0, 94.4 16 C 100.6 16.0, 100.6 16.0, 106.8 16 C 113.0 16.0, 112.9 16.0, 119.1 16 C 125.3 16.0, 125.3 16.0, 131.5 16 C 137.7 16.0, 137.6 16.0, 143.8 16 C 150.0 16.0, 150.0 16.0, 156.2 16 C 162.4 16.0, 162.3 16.0, 168.5 16 C 174.7 16.0, 174.7 16.0, 180.9 16 C 187.1 16.0, 187.0 16.0, 193.2 16 C 199.4 16.0, 199.4 16.0, 205.6 16 C 211.8 26.3, 211.7 5.7, 217.9 16 C 224.1 25.6, 224.1 68.3, 230.3 78 C 236.5 87.7, 236.4 64.3, 242.6 73.9 C 248.8 73.2, 248.8 74.6, 255 73.9 C 261.2 73.9, 261.1 73.9, 267.3 73.9 C 273.5 73.9, 273.5 73.9, 279.7 73.9 C 283.8 73.9, 287.9 73.9, 292 73.9" pathLength="1"/>
+            <circle class="chart-dot" cx="230.3" cy="78" r="3" data-cls="lo"/>
+            <circle class="chart-dot" cx="8" cy="16" r="3" data-cls="hi"/>
+            <line class="chart-cross" x1="0" y1="8" x2="0" y2="78" style="display:none"/>
+            <circle class="chart-hover-dot" r="4" style="display:none"/>
+          </svg>
+          <div class="chart-tip" style="display:none"></div>
+        </div>
+            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹60,300 (saves ~₹19,800)</div>
+            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹80,100</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">₹4,000</span></div>
             <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">₹65,750</span></div>
             <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">Vision Star</span></div>
@@ -114,26 +238,24 @@
         <div class="card ">
           <div>
             <div class="card-header">
-              <span class="card-title">Vijay Sales</span>
+              <span class="card-title">Amazon</span>
               <span>
                 
                 <span class="badge badge-ok">BUYABLE</span>
               </span>
             </div>
-            <div class="price-main">₹94,490</div>
-            <div class="price-sub">List: ₹94,490 | Trend: ▲ rising | Lowest recorded: <span class="low-record">₹92,900</span> on 13 Nov 2026, 5:38 pm</div>
-            <svg width="260" height="44" viewBox="0 0 260 44" style="display:block;margin:0.75rem 0 0;">
-    <polyline fill="none" stroke="var(--error)" stroke-width="2" points="2.0,38.0 13.1,38.0 24.3,38.0 35.4,38.0 46.5,38.0 57.7,38.0 68.8,38.0 79.9,38.0 91.0,38.0 102.2,38.0 113.3,38.0 124.4,38.0 135.6,38.0 146.7,38.0 157.8,38.0 169.0,38.0 180.1,38.0 191.2,38.0 202.3,6.0 213.5,6.0 224.6,6.0 235.7,6.0 246.9,6.0 258.0,6.0" />
-  </svg>
-            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹58,750 (saves ~₹19,800)</div>
-            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹87,940</span></div>
-            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">₹10,000</span></div>
+            <div class="price-main">₹92,900</div>
+            <div class="price-sub">List: ₹92,900 | Trend: ▬ stable</div>
+            
+            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹60,300 (saves ~₹19,800)</div>
+            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹92,900</span></div>
+            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">None</span></div>
             <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">N/A</span></div>
-            <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">Vijay Sales</span></div>
-            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">19th November, 2026</span></div>
+            <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">Clicktech Retail Private Ltd</span></div>
+            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">N/A</span></div>
             <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">N/A</span></div>
           </div>
-          <a href="https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue" target="_blank" class="btn">View Product</a>
+          <a href="https://www.amazon.in/dp/B0FQFYXCC4" target="_blank" class="btn">View Product</a>
         </div>
         <div class="card ">
           <div>
@@ -146,10 +268,26 @@
             </div>
             <div class="price-main">₹82,900</div>
             <div class="price-sub">List: ₹82,900 | Trend: ▬ stable</div>
-            <svg width="260" height="44" viewBox="0 0 260 44" style="display:block;margin:0.75rem 0 0;">
-    <polyline fill="none" stroke="var(--success)" stroke-width="2" points="2.0,38.0 17.1,38.0 32.1,38.0 47.2,38.0 62.2,38.0 77.3,38.0 92.4,38.0 107.4,38.0 122.5,38.0 137.5,38.0 152.6,38.0 167.6,38.0 182.7,38.0 197.8,38.0 212.8,38.0 227.9,38.0 242.9,38.0 258.0,38.0" />
-  </svg>
-            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹58,750 (saves ~₹19,800)</div>
+            
+        <div class="chart-wrap" data-points="[[8,78,82900,&quot;2026-11-13T12:17:53.222Z&quot;],[24.7,78,82900,&quot;2026-11-13T12:19:38.648Z&quot;],[41.4,78,82900,&quot;2026-11-13T12:21:46.179Z&quot;],[58.1,78,82900,&quot;2026-11-13T12:26:29.753Z&quot;],[74.8,78,82900,&quot;2026-11-13T12:27:50.439Z&quot;],[91.5,78,82900,&quot;2026-11-13T12:29:08.808Z&quot;],[108.2,78,82900,&quot;2026-11-13T12:30:23.791Z&quot;],[124.9,78,82900,&quot;2026-11-13T12:31:40.763Z&quot;],[141.6,78,82900,&quot;2026-11-13T13:02:18.013Z&quot;],[158.4,78,82900,&quot;2026-11-13T13:07:59.434Z&quot;],[175.1,78,82900,&quot;2026-11-13T14:59:36.169Z&quot;],[191.8,78,82900,&quot;2026-11-13T15:43:40.637Z&quot;],[208.5,78,82900,&quot;2026-11-13T20:26:59.787Z&quot;],[225.2,78,82900,&quot;2026-11-17T13:43:55.019Z&quot;],[241.9,78,82900,&quot;2026-11-17T13:46:30.737Z&quot;],[258.6,78,82900,&quot;2026-11-17T15:39:07.728Z&quot;],[275.3,78,82900,&quot;2026-11-17T16:05:01.882Z&quot;],[292,78,82900,&quot;2026-11-17T16:15:21.062Z&quot;]]" data-variant="success">
+          <svg viewBox="0 0 300 96" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+            <defs>
+              <linearGradient id="fill-iphone17-croma" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="chart-grid" x1="0" y1="78" x2="300" y2="78"/>
+            <path class="chart-area" d="M 8 78 C 13.6 78.0, 19.1 78.0, 24.7 78 C 33.0 78.0, 33.0 78.0, 41.4 78 C 49.8 78.0, 49.8 78.0, 58.1 78 C 66.5 78.0, 66.5 78.0, 74.8 78 C 83.1 78.0, 83.2 78.0, 91.5 78 C 99.8 78.0, 99.8 78.0, 108.2 78 C 116.5 78.0, 116.6 78.0, 124.9 78 C 133.3 78.0, 133.2 78.0, 141.6 78 C 150.0 78.0, 150.0 78.0, 158.4 78 C 166.8 78.0, 166.7 78.0, 175.1 78 C 183.4 78.0, 183.5 78.0, 191.8 78 C 200.2 78.0, 200.2 78.0, 208.5 78 C 216.8 78.0, 216.8 78.0, 225.2 78 C 233.5 78.0, 233.6 78.0, 241.9 78 C 250.3 78.0, 250.3 78.0, 258.6 78 C 267.0 78.0, 266.9 78.0, 275.3 78 C 280.9 78.0, 286.4 78.0, 292 78 L 292 78 L 8 78 Z" fill="url(#fill-iphone17-croma)"/>
+            <path class="chart-line" d="M 8 78 C 13.6 78.0, 19.1 78.0, 24.7 78 C 33.0 78.0, 33.0 78.0, 41.4 78 C 49.8 78.0, 49.8 78.0, 58.1 78 C 66.5 78.0, 66.5 78.0, 74.8 78 C 83.1 78.0, 83.2 78.0, 91.5 78 C 99.8 78.0, 99.8 78.0, 108.2 78 C 116.5 78.0, 116.6 78.0, 124.9 78 C 133.3 78.0, 133.2 78.0, 141.6 78 C 150.0 78.0, 150.0 78.0, 158.4 78 C 166.8 78.0, 166.7 78.0, 175.1 78 C 183.4 78.0, 183.5 78.0, 191.8 78 C 200.2 78.0, 200.2 78.0, 208.5 78 C 216.8 78.0, 216.8 78.0, 225.2 78 C 233.5 78.0, 233.6 78.0, 241.9 78 C 250.3 78.0, 250.3 78.0, 258.6 78 C 267.0 78.0, 266.9 78.0, 275.3 78 C 280.9 78.0, 286.4 78.0, 292 78" pathLength="1"/>
+            
+            
+            <line class="chart-cross" x1="0" y1="8" x2="0" y2="78" style="display:none"/>
+            <circle class="chart-hover-dot" r="4" style="display:none"/>
+          </svg>
+          <div class="chart-tip" style="display:none"></div>
+        </div>
+            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹60,300 (saves ~₹19,800)</div>
             <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹82,900</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">None</span></div>
             <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">N/A</span></div>
@@ -158,6 +296,46 @@
             <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">N/A</span></div>
           </div>
           <a href="https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400" target="_blank" class="btn">View Product</a>
+        </div>
+        <div class="card ">
+          <div>
+            <div class="card-header">
+              <span class="card-title">Vijay Sales</span>
+              <span>
+                
+                <span class="badge badge-error">NOT DELIVERABLE</span>
+              </span>
+            </div>
+            <div class="price-main">₹94,490</div>
+            <div class="price-sub">List: ₹94,490 | Trend: ▲ rising | Lowest recorded: <span class="low-record">₹92,900</span> on 13 Nov 2026, 5:38 pm</div>
+            
+        <div class="chart-wrap" data-points="[[8,78,92900,&quot;2026-11-13T12:08:18.733Z&quot;],[20.3,78,92900,&quot;2026-11-13T12:11:18.032Z&quot;],[32.7,78,92900,&quot;2026-11-13T12:19:46.289Z&quot;],[45,78,92900,&quot;2026-11-13T12:21:53.724Z&quot;],[57.4,78,92900,&quot;2026-11-13T12:26:41.630Z&quot;],[69.7,78,92900,&quot;2026-11-13T12:27:58.202Z&quot;],[82.1,78,92900,&quot;2026-11-13T12:29:16.366Z&quot;],[94.4,78,92900,&quot;2026-11-13T12:30:31.707Z&quot;],[106.8,78,92900,&quot;2026-11-13T12:31:48.572Z&quot;],[119.1,78,92900,&quot;2026-11-13T12:36:49.021Z&quot;],[131.5,78,92900,&quot;2026-11-13T12:44:04.390Z&quot;],[143.8,78,92900,&quot;2026-11-13T13:02:29.957Z&quot;],[156.2,78,92900,&quot;2026-11-13T13:08:08.809Z&quot;],[168.5,78,92900,&quot;2026-11-13T14:59:47.821Z&quot;],[180.9,78,92900,&quot;2026-11-13T15:16:51.732Z&quot;],[193.2,78,92900,&quot;2026-11-13T15:24:25.399Z&quot;],[205.6,78,92900,&quot;2026-11-13T15:43:52.455Z&quot;],[217.9,78,92900,&quot;2026-11-13T20:27:11.911Z&quot;],[230.3,16,94490,&quot;2026-11-17T13:44:04.946Z&quot;],[242.6,16,94490,&quot;2026-11-17T13:46:40.818Z&quot;],[255,16,94490,&quot;2026-11-17T14:26:56.459Z&quot;],[267.3,16,94490,&quot;2026-11-17T15:39:35.371Z&quot;],[279.7,16,94490,&quot;2026-11-17T16:05:39.736Z&quot;],[292,16,94490,&quot;2026-11-17T16:15:31.643Z&quot;]]" data-variant="error">
+          <svg viewBox="0 0 300 96" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+            <defs>
+              <linearGradient id="fill-iphone17-vijay-sales" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="chart-grid" x1="0" y1="78" x2="300" y2="78"/>
+            <path class="chart-area" d="M 8 78 C 12.1 78.0, 16.2 78.0, 20.3 78 C 26.5 78.0, 26.5 78.0, 32.7 78 C 38.9 78.0, 38.8 78.0, 45 78 C 51.2 78.0, 51.2 78.0, 57.4 78 C 63.6 78.0, 63.5 78.0, 69.7 78 C 75.9 78.0, 75.9 78.0, 82.1 78 C 88.3 78.0, 88.2 78.0, 94.4 78 C 100.6 78.0, 100.6 78.0, 106.8 78 C 113.0 78.0, 112.9 78.0, 119.1 78 C 125.3 78.0, 125.3 78.0, 131.5 78 C 137.7 78.0, 137.6 78.0, 143.8 78 C 150.0 78.0, 150.0 78.0, 156.2 78 C 162.4 78.0, 162.3 78.0, 168.5 78 C 174.7 78.0, 174.7 78.0, 180.9 78 C 187.1 78.0, 187.0 78.0, 193.2 78 C 199.4 78.0, 199.4 78.0, 205.6 78 C 211.8 67.7, 211.7 88.3, 217.9 78 C 224.1 67.7, 224.1 26.3, 230.3 16 C 236.5 5.7, 236.4 26.3, 242.6 16 C 248.8 16.0, 248.8 16.0, 255 16 C 261.2 16.0, 261.1 16.0, 267.3 16 C 273.5 16.0, 273.5 16.0, 279.7 16 C 283.8 16.0, 287.9 16.0, 292 16 L 292 78 L 8 78 Z" fill="url(#fill-iphone17-vijay-sales)"/>
+            <path class="chart-line" d="M 8 78 C 12.1 78.0, 16.2 78.0, 20.3 78 C 26.5 78.0, 26.5 78.0, 32.7 78 C 38.9 78.0, 38.8 78.0, 45 78 C 51.2 78.0, 51.2 78.0, 57.4 78 C 63.6 78.0, 63.5 78.0, 69.7 78 C 75.9 78.0, 75.9 78.0, 82.1 78 C 88.3 78.0, 88.2 78.0, 94.4 78 C 100.6 78.0, 100.6 78.0, 106.8 78 C 113.0 78.0, 112.9 78.0, 119.1 78 C 125.3 78.0, 125.3 78.0, 131.5 78 C 137.7 78.0, 137.6 78.0, 143.8 78 C 150.0 78.0, 150.0 78.0, 156.2 78 C 162.4 78.0, 162.3 78.0, 168.5 78 C 174.7 78.0, 174.7 78.0, 180.9 78 C 187.1 78.0, 187.0 78.0, 193.2 78 C 199.4 78.0, 199.4 78.0, 205.6 78 C 211.8 67.7, 211.7 88.3, 217.9 78 C 224.1 67.7, 224.1 26.3, 230.3 16 C 236.5 5.7, 236.4 26.3, 242.6 16 C 248.8 16.0, 248.8 16.0, 255 16 C 261.2 16.0, 261.1 16.0, 267.3 16 C 273.5 16.0, 273.5 16.0, 279.7 16 C 283.8 16.0, 287.9 16.0, 292 16" pathLength="1"/>
+            <circle class="chart-dot" cx="8" cy="78" r="3" data-cls="lo"/>
+            <circle class="chart-dot" cx="230.3" cy="16" r="3" data-cls="hi"/>
+            <line class="chart-cross" x1="0" y1="8" x2="0" y2="78" style="display:none"/>
+            <circle class="chart-hover-dot" r="4" style="display:none"/>
+          </svg>
+          <div class="chart-tip" style="display:none"></div>
+        </div>
+            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹60,300 (saves ~₹19,800)</div>
+            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹89,490</span></div>
+            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">₹10,000</span></div>
+            <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">N/A</span></div>
+            <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">Vijay Sales</span></div>
+            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">N/A</span></div>
+            <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">N/A</span></div>
+          </div>
+          <a href="https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue" target="_blank" class="btn">View Product</a>
         </div>
     </div>
     
@@ -172,35 +350,35 @@
           
             <tr>
               <td><strong>Christmas / Year-End Sale</strong></td>
-              <td>Sat Dec 19 2026 18:30:00 GMT+0000 (Coordinated Universal Time) → Fri Jan 01 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Dec 20 2026 00:00:00 GMT+0530 (India Standard Time) → Fri Jan 01 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 33 days</td>
               <td>5% <span class="est">(estimate)</span></td>
               <td>₹69,300</td>
-              <td><strong>~₹58,750</strong></td>
+              <td><strong>~₹60,300</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹19,800</td>
             </tr>
             <tr>
               <td><strong>Republic Day Sale</strong></td>
-              <td>Sat Jan 16 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Jan 26 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Jan 17 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Jan 26 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 61 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹65,700</td>
-              <td><strong>~₹55,150</strong></td>
+              <td><strong>~₹56,700</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹23,400</td>
             </tr>
             <tr>
               <td><strong>Valentine's Day Sale</strong></td>
-              <td>Tue Feb 09 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Feb 16 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Wed Feb 10 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Feb 16 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 85 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹65,700</td>
-              <td><strong>~₹55,150</strong></td>
+              <td><strong>~₹56,700</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹23,400</td>
             </tr>
         </tbody>
       </table>
       </div>
-      <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes. Net assumes ₹₹6,550 exchange.</p>
+      <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes. Net assumes ₹₹5,000 exchange.</p>
     </section>
 
     <h2 class="product-heading">📱 Galaxy S26 256GB <span class="watch-tag">watching</span></h2>
@@ -209,23 +387,61 @@
         <div class="card card-best">
           <div>
             <div class="card-header">
-              <span class="card-title">Flipkart</span>
+              <span class="card-title">Amazon</span>
               <span>
                 <span class="badge badge-best">★ BEST DEAL</span>
                 <span class="badge badge-ok">BUYABLE</span>
               </span>
             </div>
+            <div class="price-main">₹87,999</div>
+            <div class="price-sub">List: ₹87,999 | Trend: ▬ stable</div>
+            
+            <div class="rec rec-wait">🔵 WAIT — Christmas / Year-End Sale starts in 33 days; predicted net ~₹69,300 (saves ~₹18,699)</div>
+            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹87,999</span></div>
+            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">None</span></div>
+            <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">N/A</span></div>
+            <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">Clicktech Retail Private Ltd</span></div>
+            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">Sunday, 22 N</span></div>
+            <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">N/A</span></div>
+          </div>
+          <a href="https://www.amazon.in/dp/B0GL87VP7N" target="_blank" class="btn">View Product</a>
+        </div>
+        <div class="card ">
+          <div>
+            <div class="card-header">
+              <span class="card-title">Flipkart</span>
+              <span>
+                
+                <span class="badge badge-error">NOT DELIVERABLE</span>
+              </span>
+            </div>
             <div class="price-main">₹83,999</div>
             <div class="price-sub">List: ₹87,999 | Trend: ▬ stable</div>
-            <svg width="260" height="44" viewBox="0 0 260 44" style="display:block;margin:0.75rem 0 0;">
-    <polyline fill="none" stroke="var(--success)" stroke-width="2" points="2.0,38.0 53.2,38.0 104.4,38.0 155.6,38.0 206.8,38.0 258.0,38.0" />
-  </svg>
+            
+        <div class="chart-wrap" data-points="[[8,78,83999,&quot;2026-11-17T13:44:34.999Z&quot;],[64.8,78,83999,&quot;2026-11-17T13:47:10.856Z&quot;],[121.6,78,83999,&quot;2026-11-17T14:27:23.551Z&quot;],[178.4,78,83999,&quot;2026-11-17T15:40:32.474Z&quot;],[235.2,78,83999,&quot;2026-11-17T16:07:07.337Z&quot;],[292,78,83999,&quot;2026-11-17T16:16:11.272Z&quot;]]" data-variant="success">
+          <svg viewBox="0 0 300 96" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+            <defs>
+              <linearGradient id="fill-galaxy-s26-flipkart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="chart-grid" x1="0" y1="78" x2="300" y2="78"/>
+            <path class="chart-area" d="M 8 78 C 26.9 78.0, 45.9 78.0, 64.8 78 C 93.2 78.0, 93.2 78.0, 121.6 78 C 150.0 78.0, 150.0 78.0, 178.4 78 C 206.8 78.0, 206.8 78.0, 235.2 78 C 254.1 78.0, 273.1 78.0, 292 78 L 292 78 L 8 78 Z" fill="url(#fill-galaxy-s26-flipkart)"/>
+            <path class="chart-line" d="M 8 78 C 26.9 78.0, 45.9 78.0, 64.8 78 C 93.2 78.0, 93.2 78.0, 121.6 78 C 150.0 78.0, 150.0 78.0, 178.4 78 C 206.8 78.0, 206.8 78.0, 235.2 78 C 254.1 78.0, 273.1 78.0, 292 78" pathLength="1"/>
+            
+            
+            <line class="chart-cross" x1="0" y1="8" x2="0" y2="78" style="display:none"/>
+            <circle class="chart-hover-dot" r="4" style="display:none"/>
+          </svg>
+          <div class="chart-tip" style="display:none"></div>
+        </div>
             <div class="rec rec-buy">🟢 BUY NOW — net ₹83,999 meets target ₹83,999</div>
             <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹83,999</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">₹4,000</span></div>
             <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">₹65,750</span></div>
             <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">BTPLD</span></div>
-            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">Saturday, 21 Nov</span></div>
+            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">N/A</span></div>
             <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">No</span></div>
           </div>
           <a href="https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E" target="_blank" class="btn">View Product</a>
@@ -243,29 +459,29 @@
           
             <tr>
               <td><strong>Christmas / Year-End Sale</strong></td>
-              <td>Sat Dec 19 2026 18:30:00 GMT+0000 (Coordinated Universal Time) → Fri Jan 01 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Dec 20 2026 00:00:00 GMT+0530 (India Standard Time) → Fri Jan 01 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 33 days</td>
               <td>5% <span class="est">(estimate)</span></td>
               <td>₹69,300</td>
-              <td><strong>~₹65,300</strong></td>
+              <td><strong>~₹69,300</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹18,699</td>
             </tr>
             <tr>
               <td><strong>Republic Day Sale</strong></td>
-              <td>Sat Jan 16 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Jan 26 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Jan 17 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Jan 26 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 61 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹65,700</td>
-              <td><strong>~₹61,700</strong></td>
+              <td><strong>~₹65,700</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹22,299</td>
             </tr>
             <tr>
               <td><strong>Valentine's Day Sale</strong></td>
-              <td>Tue Feb 09 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Feb 16 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Wed Feb 10 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Feb 16 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 85 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹65,700</td>
-              <td><strong>~₹61,700</strong></td>
+              <td><strong>~₹65,700</strong></td>
               <td style="color:var(--success); font-weight:600;">WORTH WAITING — saves ~₹22,299</td>
             </tr>
         </tbody>
@@ -288,9 +504,25 @@
             </div>
             <div class="price-main">₹58,349</div>
             <div class="price-sub">List: ₹72,999 | Trend: ▼ falling</div>
-            <svg width="260" height="44" viewBox="0 0 260 44" style="display:block;margin:0.75rem 0 0;">
-    <polyline fill="none" stroke="var(--success)" stroke-width="2" points="2.0,6.0 53.2,6.0 104.4,6.0 155.6,6.0 206.8,38.0 258.0,38.0" />
-  </svg>
+            
+        <div class="chart-wrap" data-points="[[8,16,69349,&quot;2026-11-17T13:45:05.253Z&quot;],[64.8,16,69349,&quot;2026-11-17T13:47:40.972Z&quot;],[121.6,16,69349,&quot;2026-11-17T14:27:49.868Z&quot;],[178.4,78,58349,&quot;2026-11-17T15:41:37.745Z&quot;],[235.2,78,58349,&quot;2026-11-17T16:07:38.609Z&quot;],[292,78,58349,&quot;2026-11-17T16:16:51.295Z&quot;]]" data-variant="success">
+          <svg viewBox="0 0 300 96" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+            <defs>
+              <linearGradient id="fill-galaxy-s25-flipkart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="chart-grid" x1="0" y1="78" x2="300" y2="78"/>
+            <path class="chart-area" d="M 8 16 C 26.9 16.0, 45.9 16.0, 64.8 16 C 93.2 26.3, 93.2 5.7, 121.6 16 C 150.0 26.3, 150.0 67.7, 178.4 78 C 206.8 88.3, 206.8 67.7, 235.2 78 C 254.1 78.0, 273.1 78.0, 292 78 L 292 78 L 8 78 Z" fill="url(#fill-galaxy-s25-flipkart)"/>
+            <path class="chart-line" d="M 8 16 C 26.9 16.0, 45.9 16.0, 64.8 16 C 93.2 26.3, 93.2 5.7, 121.6 16 C 150.0 26.3, 150.0 67.7, 178.4 78 C 206.8 88.3, 206.8 67.7, 235.2 78 C 254.1 78.0, 273.1 78.0, 292 78" pathLength="1"/>
+            <circle class="chart-dot" cx="178.4" cy="78" r="3" data-cls="lo"/>
+            <circle class="chart-dot" cx="8" cy="16" r="3" data-cls="hi"/>
+            <line class="chart-cross" x1="0" y1="8" x2="0" y2="78" style="display:none"/>
+            <circle class="chart-hover-dot" r="4" style="display:none"/>
+          </svg>
+          <div class="chart-tip" style="display:none"></div>
+        </div>
             <div class="rec rec-buy">🟢 BUY NOW — net ₹58,349 meets target ₹58,999</div>
             <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">₹58,349</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">₹3,650</span></div>
@@ -314,7 +546,7 @@
           
             <tr>
               <td><strong>Christmas / Year-End Sale</strong></td>
-              <td>Sat Dec 19 2026 18:30:00 GMT+0000 (Coordinated Universal Time) → Fri Jan 01 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Dec 20 2026 00:00:00 GMT+0530 (India Standard Time) → Fri Jan 01 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 33 days</td>
               <td>5% <span class="est">(estimate)</span></td>
               <td>₹58,999</td>
@@ -323,7 +555,7 @@
             </tr>
             <tr>
               <td><strong>Republic Day Sale</strong></td>
-              <td>Sat Jan 16 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Jan 26 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Sun Jan 17 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Jan 26 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 61 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹55,999</td>
@@ -332,7 +564,7 @@
             </tr>
             <tr>
               <td><strong>Valentine's Day Sale</strong></td>
-              <td>Tue Feb 09 2027 18:30:00 GMT+0000 (Coordinated Universal Time) → Tue Feb 16 2027 18:29:59 GMT+0000 (Coordinated Universal Time)</td>
+              <td>Wed Feb 10 2027 00:00:00 GMT+0530 (India Standard Time) → Tue Feb 16 2027 23:59:59 GMT+0530 (India Standard Time)</td>
               <td class="">in 85 days</td>
               <td>10% <span class="est">(estimate)</span></td>
               <td>₹55,999</td>
@@ -355,7 +587,7 @@
       <tbody>
         
           <tr>
-            <td>17 Nov 2026, 9:31 pm</td>
+            <td>17 Nov 2026, 9:46 pm</td>
             <td>Galaxy S25</td>
             <td><strong>Flipkart</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
@@ -364,7 +596,16 @@
             <td>₹58,349</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 9:31 pm</td>
+            <td>17 Nov 2026, 9:46 pm</td>
+            <td>Galaxy S26</td>
+            <td><strong>Amazon</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹87,999</td>
+            <td>₹87,999</td>
+            <td>₹87,999</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:46 pm</td>
             <td>Galaxy S26</td>
             <td><strong>Flipkart</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
@@ -373,16 +614,25 @@
             <td>₹83,999</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 9:30 pm</td>
+            <td>17 Nov 2026, 9:45 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Amazon</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹92,900</td>
+            <td>₹92,900</td>
+            <td>₹92,900</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:45 pm</td>
             <td>iPhone 17</td>
             <td><strong>Vijay Sales</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
             <td>₹94,490</td>
             <td>₹94,490</td>
-            <td>₹87,940</td>
+            <td>₹89,490</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 9:30 pm</td>
+            <td>17 Nov 2026, 9:45 pm</td>
             <td>iPhone 17</td>
             <td><strong>Croma</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
@@ -391,16 +641,16 @@
             <td>₹82,900</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 9:30 pm</td>
+            <td>17 Nov 2026, 9:45 pm</td>
             <td>iPhone 17</td>
             <td><strong>Flipkart</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
             <td>₹89,100</td>
             <td>₹85,100</td>
-            <td>₹78,550</td>
+            <td>₹80,100</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 9:00 pm</td>
+            <td>17 Nov 2026, 9:37 pm</td>
             <td>Galaxy S25</td>
             <td><strong>Flipkart</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
@@ -409,134 +659,167 @@
             <td>₹58,349</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 8:59 pm</td>
+            <td>17 Nov 2026, 9:37 pm</td>
             <td>Galaxy S26</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹87,999</td>
-            <td>₹83,999</td>
-            <td>₹83,999</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:59 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Vijay Sales</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹94,490</td>
-            <td>₹94,490</td>
-            <td>₹87,940</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:59 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Croma</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹82,900</td>
-            <td>₹82,900</td>
-            <td>₹82,900</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:59 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹89,100</td>
-            <td>₹85,100</td>
-            <td>₹78,550</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:29 pm</td>
-            <td>Galaxy S25</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹72,999</td>
-            <td>₹69,349</td>
-            <td>₹69,349</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:28 pm</td>
-            <td>Galaxy S26</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹87,999</td>
-            <td>₹83,999</td>
-            <td>₹83,999</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:28 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Vijay Sales</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹94,490</td>
-            <td>₹94,490</td>
-            <td>₹87,940</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:28 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Croma</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹82,900</td>
-            <td>₹82,900</td>
-            <td>₹82,900</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 8:27 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹89,100</td>
-            <td>₹85,100</td>
-            <td>₹78,550</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 7:57 pm</td>
-            <td>Galaxy S25</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹72,999</td>
-            <td>₹69,349</td>
-            <td>₹69,349</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 7:57 pm</td>
-            <td>Galaxy S26</td>
-            <td><strong>Flipkart</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹87,999</td>
-            <td>₹83,999</td>
-            <td>₹83,999</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 7:56 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Vijay Sales</strong></td>
-            <td><span class="badge badge-ok">ok</span></td>
-            <td>₹94,490</td>
-            <td>₹94,490</td>
-            <td>₹87,940</td>
-          </tr>
-          <tr>
-            <td>17 Nov 2026, 7:56 pm</td>
-            <td>iPhone 17</td>
-            <td><strong>Croma</strong></td>
+            <td><strong>Amazon</strong></td>
             <td><span class="badge badge-error">error</span></td>
             <td>-</td>
             <td>-</td>
             <td>-</td>
           </tr>
           <tr>
-            <td>17 Nov 2026, 7:56 pm</td>
+            <td>17 Nov 2026, 9:37 pm</td>
+            <td>Galaxy S26</td>
+            <td><strong>Flipkart</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹87,999</td>
+            <td>₹83,999</td>
+            <td>₹83,999</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:35 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Vijay Sales</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹94,490</td>
+            <td>₹94,490</td>
+            <td>₹89,490</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:35 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Croma</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹82,900</td>
+            <td>₹82,900</td>
+            <td>₹82,900</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:34 pm</td>
             <td>iPhone 17</td>
             <td><strong>Flipkart</strong></td>
             <td><span class="badge badge-ok">ok</span></td>
             <td>₹89,100</td>
             <td>₹85,100</td>
-            <td>₹78,550</td>
+            <td>₹80,100</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:11 pm</td>
+            <td>Galaxy S25</td>
+            <td><strong>Flipkart</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹72,999</td>
+            <td>₹58,349</td>
+            <td>₹58,349</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:10 pm</td>
+            <td>Galaxy S26</td>
+            <td><strong>Amazon</strong></td>
+            <td><span class="badge badge-error">error</span></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:10 pm</td>
+            <td>Galaxy S26</td>
+            <td><strong>Flipkart</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹87,999</td>
+            <td>₹83,999</td>
+            <td>₹83,999</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:09 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Amazon</strong></td>
+            <td><span class="badge badge-error">error</span></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:09 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Vijay Sales</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹94,490</td>
+            <td>₹94,490</td>
+            <td>₹89,490</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:09 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Croma</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹82,900</td>
+            <td>₹82,900</td>
+            <td>₹82,900</td>
+          </tr>
+          <tr>
+            <td>17 Nov 2026, 9:08 pm</td>
+            <td>iPhone 17</td>
+            <td><strong>Flipkart</strong></td>
+            <td><span class="badge badge-ok">ok</span></td>
+            <td>₹89,100</td>
+            <td>₹85,100</td>
+            <td>₹80,100</td>
           </tr>
       </tbody>
     </table>
     </div>
   </section>
+
+  <script>
+    (function () {
+      const W = 300, H = 96;
+      const fmt = (v) => '₹' + v.toLocaleString('en-IN');
+      document.querySelectorAll('.chart-wrap').forEach(function (wrap) {
+        const svg = wrap.querySelector('svg');
+        const tip = wrap.querySelector('.chart-tip');
+        const cross = wrap.querySelector('.chart-cross');
+        const hoverDot = wrap.querySelector('.chart-hover-dot');
+        let pts = [];
+        try { pts = JSON.parse(wrap.getAttribute('data-points').replace(/&quot;/g, '"')); } catch (e) { return; }
+        if (!pts.length) return;
+        const first = pts[0][2];
+        const show = function (clientX, clientY) {
+          const rect = svg.getBoundingClientRect();
+          const vx = ((clientX - rect.left) / rect.width) * W;
+          let best = pts[0];
+          for (const p of pts) { if (Math.abs(p[0] - vx) < Math.abs(best[0] - vx)) best = p; }
+          cross.setAttribute('x1', best[0]); cross.setAttribute('x2', best[0]);
+          cross.style.display = '';
+          hoverDot.setAttribute('cx', best[0]); hoverDot.setAttribute('cy', best[1]);
+          hoverDot.style.display = '';
+          const delta = best[2] - first;
+          const pct = first ? ((delta / first) * 100).toFixed(1) : '0';
+          const dateStr = new Date(best[3]).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+          tip.innerHTML =
+            '<div class="tip-price">' + fmt(best[2]) + '</div>' +
+            '<div>' + dateStr + ' IST</div>' +
+            (delta === 0 ? '<div>start point</div>' :
+              '<div class="' + (delta < 0 ? 'tip-delta-down' : 'tip-delta-up') + '">' +
+              (delta < 0 ? '▼ ' : '▲ ') + fmt(Math.abs(delta)) + ' (' + pct + '%)</div>');
+          const wrapRect = wrap.getBoundingClientRect();
+          const leftPct = Math.min(92, Math.max(8, ((best[0] / W) * rect.width + rect.left - wrapRect.left) / wrapRect.width * 100));
+          const topPct = ((best[1] / H) * rect.height + rect.top - wrapRect.top) / wrapRect.height * 100;
+          tip.style.left = leftPct + '%';
+          tip.style.top = topPct + '%';
+        };
+        wrap.addEventListener('mousemove', function (e) { show(e.clientX, e.clientY); });
+        wrap.addEventListener('mouseleave', function () {
+          tip.style.display = 'none';
+          cross.style.display = 'none';
+          hoverDot.style.display = 'none';
+        });
+        wrap.addEventListener('mouseenter', function () { tip.style.display = ''; });
+        wrap.addEventListener('touchstart', function (e) {
+          if (e.touches[0]) show(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+      });
+    })();
+  </script>
 </body>
 </html>
