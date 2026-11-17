@@ -1,4 +1,4 @@
-name: iPhone 17 Price Monitor
+name: Price Monitor (iPhone 17 · Galaxy S25 · S26)
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   actions: write
+  issues: write
 
 concurrency:
   group: price-monitor
@@ -35,15 +36,28 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Run Price Monitor (Croma runs headed under Xvfb for Akamai bypass)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           xvfb-run -a npm run monitor
+
+      - name: Determine commit message from alerts
+        id: commitmsg
+        if: always()
+        run: |
+          if [ -f data/alert-headline.txt ] && ! grep -q '^no alerts$' data/alert-headline.txt; then
+            headline=$(head -c 150 data/alert-headline.txt)
+            echo "msg=🔻 $headline [skip ci]" >> "$GITHUB_OUTPUT"
+          else
+            echo "msg=chore: update price history and dashboard [skip ci]" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Commit Updated Price Data & Dashboard
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: update price history and dashboard [skip ci]"
-          file_pattern: "data/*.json data/*.jsonl dashboard.html reports/*.md"
+          commit_message: ${{ steps.commitmsg.outputs.msg }}
+          file_pattern: "data/*.json data/*.jsonl data/alert-headline.txt dashboard.html reports/*.md"
 
       - name: Chain next run in ~30 min
         if: always()

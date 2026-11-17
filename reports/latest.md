@@ -1,19 +1,40 @@
-# 📱 iPhone 17 (256GB, Mist Blue) Price Report
-**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 7:26 pm IST
+# 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
+**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 7:22 pm IST
 
-| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Exchange Ceiling | Net (w/ ₹6550 M35) | Delivery |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | ✅ Yes | **₹85,100** | ₹89,100 | ₹4,000 (Flipkart Axis) | ₹65,750 | **₹78,550** | Thursday, 19 Nov |
-| 2 | [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | ✅ Yes | **₹94,490** | ₹94,490 | ₹10,000 (HSBC TAJ Bank Credit Card EMI) | Available | **₹87,940** | N/A |
-| 3 | [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | ❌ No | **₹82,900** | ₹82,900 | None | N/A | **₹82,900** | Not available for 500055 |
+## iPhone 17 256GB Mist Blue
+
+| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net (w/ ₹6550 exchange) | Delivery |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | ✅ Yes | **₹85,100** | ₹89,100 | ₹4,000 (Flipkart Axis) | **₹78,550** | Thursday, 19 Nov |
+| 2 | [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | ❌ No | **₹82,900** | ₹82,900 | None | **₹82,900** | Not available for 500055 |
+| 3 | [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | ❌ No | **₹94,490** | ₹94,490 | ₹10,000 (HSBC TAJ Bank Credit Card EMI) | **₹87,940** | N/A |
 
 ### 🛒 Sales Analyser
 - Current best buyable: Flipkart net ₹78,550
-- 💰 **Christmas / Year-End Sale** (33 days): expected list ~₹78,800 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹68,250 — **WORTH WAITING — saves ~₹10,300**
-- 💰 **Republic Day Sale** (61 days): expected list ~₹74,600 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹64,050 — **WORTH WAITING — saves ~₹14,500**
-- 💰 **Valentine's Day Sale** (85 days): expected list ~₹74,600 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹64,050 — **WORTH WAITING — saves ~₹14,500**
+- 💰 **Christmas / Year-End Sale** (33 days): expected list ~₹69,300 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹58,750 — **WORTH WAITING — saves ~₹19,800**
+- 💰 **Republic Day Sale** (61 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,150 — **WORTH WAITING — saves ~₹23,400**
+- 💰 **Valentine's Day Sale** (85 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,150 — **WORTH WAITING — saves ~₹23,400**
 
-### 🎯 Targets
-- **Flipkart:** List ≤ `₹84,999` | Net ≤ `₹74,000`
-- **Croma:** List ≤ `₹82,900` | Net ≤ `₹76,400`
-- **Vijay Sales:** List ≤ `₹84,999` | Net ≤ `₹78,449`
+## Galaxy S26 256GB
+
+| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | ✅ Yes | **₹83,999** | ₹87,999 | ₹4,000 (Flipkart Axis) | **₹83,999** | Saturday, 21 Nov |
+
+### 🛒 Sales Analyser
+- Current best buyable: Flipkart net ₹83,999
+- 💰 **Christmas / Year-End Sale** (33 days): expected list ~₹69,300 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹65,300 — **WORTH WAITING — saves ~₹18,699**
+- 💰 **Republic Day Sale** (61 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,700 — **WORTH WAITING — saves ~₹22,299**
+- 💰 **Valentine's Day Sale** (85 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,700 — **WORTH WAITING — saves ~₹22,299**
+
+## Galaxy S25 256GB
+
+| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹69,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹69,349** | Thursday, 19 Nov |
+
+### 🛒 Sales Analyser
+- Current best buyable: Flipkart net ₹69,349
+- 💰 **Christmas / Year-End Sale** (33 days): expected list ~₹58,999 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,349 — **WORTH WAITING — saves ~₹14,000**
+- 💰 **Republic Day Sale** (61 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹17,000**
+- 💰 **Valentine's Day Sale** (85 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹17,000**

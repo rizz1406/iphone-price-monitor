@@ -1,65 +1,160 @@
 {
   "pincode": "500055",
   "currency": "INR",
-  "assumedExchangeValue": 6550,
   "worthWaitingSavings": 4000,
-  "saleCalendar": [
+  "products": [
     {
-      "name": "Christmas / Year-End Sale",
-      "start": "2026-12-20",
-      "end": "2027-01-01",
-      "expectedListPrice": 89999,
-      "historicalDropPct": 0.05,
-      "note": "Apple phones typically drop ~5% below current list; net ~₹81,000-84,000 with bank offer + exchange"
+      "id": "iphone17",
+      "name": "iPhone 17 256GB Mist Blue",
+      "shortName": "iPhone 17",
+      "assumedExchangeValue": 6550,
+      "saleCalendar": [
+        {
+          "name": "Christmas / Year-End Sale",
+          "start": "2026-12-20",
+          "end": "2027-01-01",
+          "expectedListPrice": 89999,
+          "historicalDropPct": 0.05,
+          "note": "Apple phones typically drop ~5% below current list; net ~₹81,000-84,000 with bank offer + exchange"
+        },
+        {
+          "name": "Republic Day Sale",
+          "start": "2027-01-17",
+          "end": "2027-01-26",
+          "expectedListPrice": 84999,
+          "historicalDropPct": 0.1,
+          "note": "Apple phones typically drop ~10% below current list; net ~₹72,000-78,000 with SBI ₹7,041 + M35 exchange ₹6,550"
+        },
+        {
+          "name": "Valentine's Day Sale",
+          "start": "2027-02-10",
+          "end": "2027-02-16",
+          "expectedListPrice": 84999,
+          "historicalDropPct": 0.1,
+          "note": "Usually matches Republic Day pricing; backup window"
+        }
+      ],
+      "sites": [
+        {
+          "id": "flipkart",
+          "name": "Flipkart",
+          "type": "flipkart",
+          "enabled": true,
+          "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
+          "targetListPrice": 84999,
+          "targetEffectivePrice": 80000,
+          "targetNetWithExchange": 74000
+        },
+        {
+          "id": "croma",
+          "name": "Croma",
+          "type": "croma",
+          "enabled": true,
+          "headed": true,
+          "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
+          "targetListPrice": 82900,
+          "targetEffectivePrice": 82900,
+          "targetNetWithExchange": 76400
+        },
+        {
+          "id": "vijay-sales",
+          "name": "Vijay Sales",
+          "type": "vijay",
+          "enabled": true,
+          "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
+          "targetListPrice": 84999,
+          "targetEffectivePrice": 84999,
+          "targetNetWithExchange": 78449
+        }
+      ]
     },
     {
-      "name": "Republic Day Sale",
-      "start": "2027-01-17",
-      "end": "2027-01-26",
-      "expectedListPrice": 84999,
-      "historicalDropPct": 0.1,
-      "note": "Apple phones typically drop ~10% below current list; net ~₹72,000-78,000 with SBI ₹7,041 + M35 exchange ₹6,550"
+      "id": "galaxy-s26",
+      "name": "Galaxy S26 256GB",
+      "shortName": "Galaxy S26",
+      "assumedExchangeValue": 0,
+      "saleCalendar": [
+        {
+          "name": "Christmas / Year-End Sale",
+          "start": "2026-12-20",
+          "end": "2027-01-01",
+          "expectedListPrice": 85999,
+          "historicalDropPct": 0.05,
+          "note": "S26 street price has been volatile after the Sept price hike"
+        },
+        {
+          "name": "Republic Day Sale",
+          "start": "2027-01-17",
+          "end": "2027-01-26",
+          "expectedListPrice": 79999,
+          "historicalDropPct": 0.1,
+          "note": "BBD saw S26 at ₹74,999; RD typically similar"
+        },
+        {
+          "name": "Valentine's Day Sale",
+          "start": "2027-02-10",
+          "end": "2027-02-16",
+          "expectedListPrice": 79999,
+          "historicalDropPct": 0.1,
+          "note": "Usually matches Republic Day pricing; backup window"
+        }
+      ],
+      "sites": [
+        {
+          "id": "flipkart",
+          "name": "Flipkart",
+          "type": "flipkart",
+          "enabled": true,
+          "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
+          "targetListPrice": 85999,
+          "targetEffectivePrice": 83999,
+          "targetNetWithExchange": 83999
+        }
+      ]
     },
     {
-      "name": "Valentine's Day Sale",
-      "start": "2027-02-10",
-      "end": "2027-02-16",
-      "expectedListPrice": 84999,
-      "historicalDropPct": 0.1,
-      "note": "Usually matches Republic Day pricing; backup window"
-    }
-  ],
-  "sites": [
-    {
-      "id": "flipkart",
-      "name": "Flipkart",
-      "type": "flipkart",
-      "enabled": true,
-      "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
-      "targetListPrice": 84999,
-      "targetEffectivePrice": 80000,
-      "targetNetWithExchange": 74000
-    },
-    {
-      "id": "croma",
-      "name": "Croma",
-      "type": "croma",
-      "enabled": true,
-      "headed": true,
-      "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
-      "targetListPrice": 82900,
-      "targetEffectivePrice": 82900,
-      "targetNetWithExchange": 76400
-    },
-    {
-      "id": "vijay-sales",
-      "name": "Vijay Sales",
-      "type": "vijay",
-      "enabled": true,
-      "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
-      "targetListPrice": 84999,
-      "targetEffectivePrice": 84999,
-      "targetNetWithExchange": 78449
+      "id": "galaxy-s25",
+      "name": "Galaxy S25 256GB",
+      "shortName": "Galaxy S25",
+      "assumedExchangeValue": 0,
+      "saleCalendar": [
+        {
+          "name": "Christmas / Year-End Sale",
+          "start": "2026-12-20",
+          "end": "2027-01-01",
+          "expectedListPrice": 58999,
+          "historicalDropPct": 0.05,
+          "note": "S25 is at all-time-low territory (~₹61,000) as it nears end of cycle"
+        },
+        {
+          "name": "Republic Day Sale",
+          "start": "2027-01-17",
+          "end": "2027-01-26",
+          "expectedListPrice": 55999,
+          "historicalDropPct": 0.1,
+          "note": "Older-gen phone; deeper cuts possible as S27 approaches"
+        },
+        {
+          "name": "Valentine's Day Sale",
+          "start": "2027-02-10",
+          "end": "2027-02-16",
+          "expectedListPrice": 55999,
+          "historicalDropPct": 0.1,
+          "note": "Usually matches Republic Day pricing; backup window"
+        }
+      ],
+      "sites": [
+        {
+          "id": "flipkart",
+          "name": "Flipkart",
+          "type": "flipkart",
+          "enabled": true,
+          "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537",
+          "targetListPrice": 59999,
+          "targetEffectivePrice": 58999,
+          "targetNetWithExchange": 58999
+        }
+      ]
     }
   ]
 }

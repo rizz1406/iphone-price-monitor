@@ -127,7 +127,7 @@ const setFlipkartPincode = async (page, pincode) => {
   return hasFlipkartPincode(text, pincode);
 };
 
-const extractFlipkart = async (page, site) => {
+const extractFlipkart = async (page, site, product) => {
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(5000);
   let pincodeSet = false;
@@ -144,8 +144,8 @@ const extractFlipkart = async (page, site) => {
   await page.waitForTimeout(3000);
 
   const text = await page.locator('body').innerText();
-  const product = await getProductJsonLd(page);
-  const offer = getOffer(product);
+  const jsonLd = await getProductJsonLd(page);
+  const offer = getOffer(jsonLd);
   const bankOffers = parseBanks(text);
   const maxBankOffer = bankOffers[0]?.amount ?? null;
   const listPrice =
@@ -162,11 +162,13 @@ const extractFlipkart = async (page, site) => {
 
   return {
     site: site.id,
+    product: product.id,
+    productName: product.name,
     name: site.name,
     checkedAt: new Date().toISOString(),
     status: 'ok',
     url: site.url,
-    title: await page.locator('h1').first().innerText().catch(() => product?.name ?? ''),
+    title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
     listPrice,
     effectivePrice,
     maxBankOffer,
@@ -174,10 +176,10 @@ const extractFlipkart = async (page, site) => {
     bankOfferKind: 'instant',
     exchangeCeiling,
     exchangeAvailable,
-    assumedExchangeValue: config.assumedExchangeValue,
+    assumedExchangeValue: product.assumedExchangeValue,
     netWithExchange:
-      effectivePrice && config.assumedExchangeValue
-        ? Math.max(0, effectivePrice - config.assumedExchangeValue)
+      effectivePrice && product.assumedExchangeValue
+        ? Math.max(0, effectivePrice - product.assumedExchangeValue)
         : effectivePrice,
     seller: text.match(/Seller:\s*([^\n]+)/i)?.[1]?.trim() ?? null,
     delivery: text.match(/Delivery by\s*\n?\s*([^\n]+)/i)?.[1]?.trim() ?? null,
@@ -213,7 +215,7 @@ const setCromaPincode = async (page, pincode) => {
   await page.waitForTimeout(4000);
 };
 
-const extractCroma = async (page, site) => {
+const extractCroma = async (page, site, product) => {
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(6000);
   let text = await page.locator('body').innerText();
@@ -222,19 +224,21 @@ const extractCroma = async (page, site) => {
   }
   await setCromaPincode(page, config.pincode);
   text = await page.locator('body').innerText();
-  const product = await getProductJsonLd(page);
-  const offer = getOffer(product);
+  const jsonLd = await getProductJsonLd(page);
+  const offer = getOffer(jsonLd);
   const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Croma price');
   const deliverable = !/Not Available for your pincode/i.test(text);
 
   return {
     site: site.id,
+    product: product.id,
+    productName: product.name,
     name: site.name,
     checkedAt: new Date().toISOString(),
     status: 'ok',
     url: site.url,
-    title: await page.locator('h1').first().innerText().catch(() => product?.name ?? ''),
+    title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
     listPrice,
     effectivePrice: listPrice,
     maxBankOffer: null,
@@ -260,15 +264,15 @@ const extractCroma = async (page, site) => {
   };
 };
 
-const extractVijay = async (page, site) => {
+const extractVijay = async (page, site, product) => {
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(6000);
   const text = await page.locator('body').innerText();
   if (/Access Denied|don't have permission to access/i.test(text)) {
     throw new Error('Vijay Sales blocked the request');
   }
-  const product = await getProductJsonLd(page);
-  const offer = getOffer(product);
+  const jsonLd = await getProductJsonLd(page);
+  const offer = getOffer(jsonLd);
   const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Vijay Sales price');
   const bankOffers = parseVijayOffers(text);
@@ -276,11 +280,13 @@ const extractVijay = async (page, site) => {
 
   return {
     site: site.id,
+    product: product.id,
+    productName: product.name,
     name: site.name,
     checkedAt: new Date().toISOString(),
     status: 'ok',
     url: site.url,
-    title: await page.locator('h1').first().innerText().catch(() => product?.name ?? ''),
+    title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
     listPrice,
     effectivePrice: listPrice,
     maxBankOffer,
@@ -288,9 +294,9 @@ const extractVijay = async (page, site) => {
     bankOfferKind: 'emi',
     exchangeCeiling: null,
     exchangeAvailable: /Exchange Bonus/i.test(text),
-    assumedExchangeValue: config.assumedExchangeValue,
-    netWithExchange: listPrice && config.assumedExchangeValue
-      ? Math.max(0, listPrice - config.assumedExchangeValue)
+    assumedExchangeValue: product.assumedExchangeValue,
+    netWithExchange: listPrice && product.assumedExchangeValue
+      ? Math.max(0, listPrice - product.assumedExchangeValue)
       : listPrice,
     seller: 'Vijay Sales',
     delivery: text.match(/Free delivery by\s*([^\n]+)/i)?.[1]?.trim() ?? null,
@@ -312,10 +318,12 @@ const extractors = {
   vijay: extractVijay,
 };
 
+const resultKey = (result) => `${result.product ?? 'iphone17'}:${result.site}`;
+
 const readPrevious = async () => {
   try {
     const latest = JSON.parse(await readFile(latestPath, 'utf8'));
-    return new Map(latest.sites.map((site) => [site.site, site]));
+    return new Map(latest.sites.map((site) => [resultKey(site), site]));
   } catch {
     return new Map();
   }
@@ -371,9 +379,9 @@ const calculateReasons = (result, previous) => {
 
 const formatSite = (result) => {
   if (result.status === 'error') {
-    return `${result.name}: ERROR - ${result.error}\n${result.url}`;
+    return `${result.productName ?? result.name}: ${result.name} ERROR - ${result.error}\n${result.url}`;
   }
-  const lines = [`${result.name}: ${result.title || 'iPhone 17 256GB Mist Blue'}`];
+  const lines = [`${result.productName ?? 'iPhone 17'} @ ${result.name}: ${result.title || result.productName}`];
   lines.push(`List: ${result.listPrice ? money.format(result.listPrice) : 'unknown'}`);
   if (result.effectivePrice) lines.push(`Effective: ${money.format(result.effectivePrice)}`);
   if (result.maxBankOffer) {
@@ -385,7 +393,7 @@ const formatSite = (result) => {
     lines.push(`Exchange ceiling: ${money.format(result.exchangeCeiling)}${result.exchangeAvailable ? '' : ' (not available at this pincode)'}`);
   }
   if (result.netWithExchange && result.exchangeAvailable) {
-    lines.push(`Net with assumed exchange ${money.format(config.assumedExchangeValue)}: ${money.format(result.netWithExchange)}`);
+    lines.push(`Net with assumed exchange ${result.assumedExchangeValue ? money.format(result.assumedExchangeValue) : 'none'}: ${money.format(result.netWithExchange)}`);
   }
   if (result.seller) lines.push(`Seller: ${result.seller}`);
   if (result.delivery) lines.push(`Delivery: ${result.delivery}`);
@@ -395,6 +403,33 @@ const formatSite = (result) => {
   );
   lines.push(result.url);
   return lines.join('\n');
+};
+
+const alertHeadline = (product, reasons) => `${product} — ${reasons[0]}`;
+
+// GitHub Issues as the alert inbox: one issue per change-event. GitHub emails the
+// repo owner automatically. Skipped when GH_TOKEN is absent (local runs).
+const createAlertIssue = async (result, reasons) => {
+  const token = process.env.GH_TOKEN;
+  const repo = process.env.GITHUB_REPOSITORY;
+  if (!token || !repo) return;
+  try {
+    const response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: `[Price Alert] ${result.productName ?? result.product} @ ${result.name}`,
+        body: `${formatSite(result)}\n\n**Reasons:** ${reasons.join('; ')}\n\n[Dashboard](https://${repo.split('/')[0]}.github.io/${repo.split('/')[1]}/dashboard.html)`,
+      }),
+    });
+    if (!response.ok) console.log(`Issue creation failed: HTTP ${response.status}`);
+  } catch (error) {
+    console.log(`Issue creation failed: ${error.message}`);
+  }
 };
 
 const notify = async (message) => {
@@ -412,6 +447,7 @@ const main = async () => {
   const previousResults = [...previousSites.values()];
   const results = [];
   const alertMessages = [];
+  const headlines = [];
   const browsers = new Map();
 
   const getPage = async (site) => {
@@ -432,44 +468,50 @@ const main = async () => {
     return browsers.get(key).context.newPage();
   };
 
-  for (const site of config.sites.filter((entry) => entry.enabled)) {
-    const page = await getPage(site);
-    const previous = previousSites.get(site.id);
-    let result;
-    try {
-      result = await extractors[site.type](page, site);
-    } catch (error) {
-      const screenshot = path.join(errorDir, `${site.id}-${Date.now()}.png`);
-      await page.screenshot({ path: screenshot, fullPage: false }).catch(() => {});
-      result = {
-        site: site.id,
-        name: site.name,
-        checkedAt: new Date().toISOString(),
-        status: 'error',
-        error: error.message,
-        url: site.url,
-        targets: {
-          listPrice: site.targetListPrice,
-          effectivePrice: site.targetEffectivePrice,
-          netWithExchange: site.targetNetWithExchange,
-        },
-      };
-    } finally {
-      if (debug && result?.status === 'ok') {
-        const text = await page.locator('body').innerText().catch(() => '');
-        await writeFile(path.join(dataDir, `debug-${site.id}.txt`), text).catch(() => {});
+  for (const product of config.products) {
+    for (const site of product.sites.filter((entry) => entry.enabled)) {
+      const page = await getPage(site);
+      const previous = previousSites.get(`${product.id}:${site.id}`);
+      let result;
+      try {
+        result = await extractors[site.type](page, site, product);
+      } catch (error) {
+        const screenshot = path.join(errorDir, `${product.id}-${site.id}-${Date.now()}.png`);
+        await page.screenshot({ path: screenshot, fullPage: false }).catch(() => {});
+        result = {
+          site: site.id,
+          product: product.id,
+          productName: product.name,
+          name: site.name,
+          checkedAt: new Date().toISOString(),
+          status: 'error',
+          error: error.message,
+          url: site.url,
+          targets: {
+            listPrice: site.targetListPrice,
+            effectivePrice: site.targetEffectivePrice,
+            netWithExchange: site.targetNetWithExchange,
+          },
+        };
+      } finally {
+        if (debug && result?.status === 'ok') {
+          const text = await page.locator('body').innerText().catch(() => '');
+          await writeFile(path.join(dataDir, `debug-${site.id}.txt`), text).catch(() => {});
+        }
+        await page.close();
       }
-      await page.close();
-    }
 
-    results.push(result);
-    const reasons = calculateReasons(result, previous);
-    if (reasons.length) {
-      alertMessages.push(`${formatSite(result)}\nReason: ${reasons.join('; ')}`);
+      results.push(result);
+      const reasons = calculateReasons(result, previous);
+      if (reasons.length) {
+        alertMessages.push(`${formatSite(result)}\nReason: ${reasons.join('; ')}`);
+        await createAlertIssue(result, reasons);
+        headlines.push(alertHeadline(result.productName ?? result.product, reasons));
+      }
+      console.log(`\n--- ${result.productName ?? product.name} @ ${site.name} ---`);
+      console.log(formatSite(result));
+      console.log('Reasons:', reasons.length ? reasons.join('; ') : 'none');
     }
-    console.log(`\n--- ${site.name} ---`);
-    console.log(formatSite(result));
-    console.log('Reasons:', reasons.length ? reasons.join('; ') : 'none');
   }
 
   for (const entry of browsers.values()) {
@@ -483,28 +525,39 @@ const main = async () => {
     await appendFile(historyPath, JSON.stringify(result) + '\n');
   }
 
+  // Commit-message headline: consumed by CI to prefix the bot commit, and cleared
+  // every run so a stale flag never survives into the next commit.
+  await writeFile(
+    path.join(dataDir, 'alert-headline.txt'),
+    headlines.length ? `ALERT: ${headlines.slice(0, 3).join(' | ')}` : 'no alerts',
+  ).catch(() => {});
+
   await writeReports({ root, config, results, historyPath });
 
   if (summaryOnly) {
-    const lines = [`iPhone 17 256GB Mist Blue - pincode ${config.pincode}`, `Checked: ${now}`, ''];
-    for (const result of results) lines.push(formatSite(result), '');
-    const priced = results.filter((result) => result.effectivePrice);
-    if (priced.length) {
-      const best = priced.reduce((lowest, result) =>
-        result.effectivePrice < lowest.effectivePrice ? result : lowest
-      );
-      lines.push(`Best effective: ${best.name} at ${money.format(best.effectivePrice)}`);
+    const lines = [`Price monitor — pincode ${config.pincode}`, `Checked: ${now}`, ''];
+    for (const product of config.products) {
+      const productResults = results.filter((result) => result.product === product.id);
+      lines.push(`== ${product.name} ==`);
+      for (const result of productResults) lines.push(formatSite(result), '');
+      const priced = productResults.filter((result) => result.effectivePrice);
+      if (priced.length) {
+        const best = priced.reduce((lowest, result) =>
+          result.effectivePrice < lowest.effectivePrice ? result : lowest
+        );
+        lines.push(`Best effective: ${best.name} at ${money.format(best.effectivePrice)}`, '');
+      }
     }
     await notify(lines.join('\n'));
     return;
   }
 
-  const failed = results.filter((result) => result.status === 'error');
   if (alertMessages.length) {
-    await notify(`iPhone 17 price alert\n\n${alertMessages.join('\n\n')}`);
+    await notify(`Price alert\n\n${alertMessages.join('\n\n')}`);
   } else {
     console.log('No alerts this run.');
   }
+  const failed = results.filter((result) => result.status === 'error');
   if (failed.length === results.length) {
     process.exitCode = 1;
   }
