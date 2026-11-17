@@ -136,7 +136,7 @@ const setFlipkartPincode = async (page, pincode) => {
   return hasFlipkartPincode(text, pincode);
 };
 
-const extractFlipkart = async (page, site, product) => {
+const extractFlipkartOnce = async (page, site, product) => {
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(5000);
   let pincodeSet = false;
@@ -202,6 +202,22 @@ const extractFlipkart = async (page, site, product) => {
       netWithExchange: site.targetNetWithExchange,
     },
   };
+};
+
+// Flipkart intermittently bot-walls datacenter IPs. Retry with backoff before
+// giving up so one flake doesn't produce a false "site check failed" alert.
+const extractFlipkart = async (page, site, product) => {
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      return await extractFlipkartOnce(page, site, product);
+    } catch (error) {
+      lastError = error;
+      if (debug) console.log(`Flipkart attempt ${attempt} failed: ${error.message}`);
+      if (attempt < 2) await page.waitForTimeout(20000);
+    }
+  }
+  throw lastError;
 };
 
 const setCromaPincode = async (page, pincode) => {
@@ -414,7 +430,9 @@ const readPrevious = async () => {
 const calculateReasons = (result, previous) => {
   const reasons = [];
   if (result.status === 'error') {
-    if (previous?.status !== 'error') reasons.push('site check failed');
+    // One-off flakes are common (bot walls); only alert once a site has failed
+    // two runs in a row (~35+ min of real downtime).
+    if (previous?.status === 'error') reasons.push('site check failed');
     return reasons;
   }
   if (!previous) {
