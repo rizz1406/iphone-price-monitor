@@ -1,13 +1,13 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 7:22 pm IST
+**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 7:57 pm IST
 
 ## iPhone 17 256GB Mist Blue
 
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net (w/ ₹6550 exchange) | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | ✅ Yes | **₹85,100** | ₹89,100 | ₹4,000 (Flipkart Axis) | **₹78,550** | Thursday, 19 Nov |
-| 2 | [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | ❌ No | **₹82,900** | ₹82,900 | None | **₹82,900** | Not available for 500055 |
-| 3 | [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | ❌ No | **₹94,490** | ₹94,490 | ₹10,000 (HSBC TAJ Bank Credit Card EMI) | **₹87,940** | N/A |
+| 2 | [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | ✅ Yes | **₹94,490** | ₹94,490 | ₹10,000 (HSBC TAJ Bank Credit Card EMI) | **₹87,940** | 19th November, 2026 |
+| 3 | **Croma** | - | ❌ Error (last good: see dashboard) | - | - | - | - |
 
 ### 🛒 Sales Analyser
 - Current best buyable: Flipkart net ₹78,550
