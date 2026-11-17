@@ -1,5 +1,5 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 8:29 pm IST
+**Target Pincode:** `500055` | **Updated:** 17 Nov 2026, 9:00 pm IST
 
 ## iPhone 17 256GB Mist Blue
 
@@ -31,10 +31,10 @@
 
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹69,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹69,349** | Thursday, 19 Nov |
+| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹58,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹58,349** | Thursday, 19 Nov |
 
 ### 🛒 Sales Analyser
-- Current best buyable: Flipkart net ₹69,349
-- 💰 **Christmas / Year-End Sale** (33 days): expected list ~₹58,999 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,349 — **WORTH WAITING — saves ~₹14,000**
-- 💰 **Republic Day Sale** (61 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹17,000**
-- 💰 **Valentine's Day Sale** (85 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹17,000**
+- Current best buyable: Flipkart net ₹58,349
+- 🤔 **Christmas / Year-End Sale** (33 days): expected list ~₹58,999 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,349 — **MARGINAL — saves ~₹3,000**
+- 💰 **Republic Day Sale** (61 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹6,000**
+- 💰 **Valentine's Day Sale** (85 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹6,000**
