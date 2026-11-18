@@ -1,5 +1,5 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Target Pincode:** `500055` | **Updated:** 18 Nov 2026, 3:36 pm IST
+**Target Pincode:** `500055` | **Updated:** 18 Nov 2026, 4:08 pm IST
 
 ## iPhone 17 256GB Mist Blue
 
