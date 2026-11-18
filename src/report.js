@@ -40,65 +40,100 @@ const trendOf = (entries) => {
   return 'flat';
 };
 
-// Interactive chart: smooth animated line + gradient fill; hover shows crosshair,
-// nearest-point marker and a tooltip with date/price/delta. Fully inline, no deps.
+// Interactive chart: time-based x-axis, monotone-cubic smoothing (no overshoot on
+// flat plateaus), padded y-domain so flat series still render mid-chart, animated
+// draw-in, min/max dots, axis dates and hover crosshair + tooltip. Inline, no deps.
 const chart = (entries, id) => {
   const values = entries.map((entry) => entry.effectivePrice);
   if (values.length < 2) return '';
-  const W = 300;
-  const H = 96;
+  const W = 320;
+  const H = 100;
   const PAD_X = 8;
-  const PAD_TOP = 16;
-  const PAD_BOTTOM = 18;
+  const PAD_TOP = 18;
+  const PAD_BOTTOM = 22;
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const span = Math.max(1, max - min);
-  const pts = values.map((value, index) => ({
-    x: +(PAD_X + (index / (values.length - 1)) * (W - PAD_X * 2)).toFixed(1),
-    y: +(H - PAD_BOTTOM - ((value - min) / span) * (H - PAD_TOP - PAD_BOTTOM)).toFixed(1),
-    v: value,
-    t: entries[index].checkedAt,
-  }));
-  const smoothPath = (points) => {
+  const span = max - min;
+  const pad = Math.max(span * 0.18, Math.round(max * 0.004) || 50);
+  const lo = min - pad;
+  const hi = max + pad;
+  const times = entries.map((entry) => new Date(entry.checkedAt).getTime());
+  const t0 = Math.min(...times);
+  const t1 = Math.max(...times);
+  const timeSpan = t1 - t0;
+  const pts = values.map((value, index) => {
+    const xRatio = timeSpan > 0 ? (times[index] - t0) / timeSpan : index / (values.length - 1);
+    const yRatio = (value - lo) / (hi - lo);
+    return {
+      x: +(PAD_X + xRatio * (W - PAD_X * 2)).toFixed(1),
+      y: +(H - PAD_BOTTOM - yRatio * (H - PAD_TOP - PAD_BOTTOM)).toFixed(1),
+      v: value,
+      t: entries[index].checkedAt,
+    };
+  });
+  const monotonePath = (points) => {
+    const n = points.length;
+    if (n === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+    const dx = [];
+    const slopes = [];
+    for (let i = 0; i < n - 1; i += 1) {
+      dx[i] = Math.max(points[i + 1].x - points[i].x, 0.001);
+      slopes[i] = (points[i + 1].y - points[i].y) / dx[i];
+    }
+    const m = new Array(n);
+    m[0] = slopes[0];
+    m[n - 1] = slopes[n - 2];
+    for (let i = 1; i < n - 1; i += 1) {
+      if (slopes[i - 1] * slopes[i] <= 0) {
+        m[i] = 0;
+      } else {
+        const w1 = 2 * dx[i] + dx[i - 1];
+        const w2 = dx[i] + 2 * dx[i - 1];
+        m[i] = (w1 + w2) / (w1 / slopes[i - 1] + w2 / slopes[i]);
+      }
+    }
     let d = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 1; i < points.length; i += 1) {
-      const p0 = points[i - 1];
-      const p1 = points[i];
-      const pp = points[i - 2] ?? p0;
-      const pn = points[i + 1] ?? p1;
-      const c1x = p0.x + (pn.x - pp.x) / 6;
-      const c1y = p0.y + (pn.y - pp.y) / 6;
-      const c2x = p1.x - (pn.x - pp.x) / 6;
-      const c2y = p1.y - (pn.y - pp.y) / 6;
-      d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p1.x} ${p1.y}`;
+    for (let i = 0; i < n - 1; i += 1) {
+      const c1x = points[i].x + dx[i] / 3;
+      const c1y = points[i].y + (m[i] * dx[i]) / 3;
+      const c2x = points[i + 1].x - dx[i] / 3;
+      const c2y = points[i + 1].y - (m[i + 1] * dx[i]) / 3;
+      d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${points[i + 1].x} ${points[i + 1].y}`;
     }
     return d;
   };
-  const linePath = smoothPath(pts);
+  const linePath = monotonePath(pts);
   const areaPath = `${linePath} L ${pts[pts.length - 1].x} ${H - PAD_BOTTOM} L ${pts[0].x} ${H - PAD_BOTTOM} Z`;
   const color = values[values.length - 1] <= values[0] ? 'success' : 'error';
+  const flatish = span / Math.max(1, max) < 0.004;
   const minIdx = values.indexOf(min);
   const maxIdx = values.indexOf(max);
   const dataJson = JSON.stringify(pts.map((p) => [p.x, p.y, p.v, p.t])).replace(/"/g, '&quot;');
   const dot = (idx, cls) =>
     `<circle class="chart-dot" cx="${pts[idx].x}" cy="${pts[idx].y}" r="3" data-cls="${cls}"/>`;
+  const firstDate = istDate(pts[0].t);
+  const lastDate = istDate(pts[pts.length - 1].t);
   return `
         <div class="chart-wrap" data-points="${dataJson}" data-variant="${color}">
-          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Price history chart">
+          <div class="chart-hi" ${flatish ? 'style="top: 45%;"' : ''}>${money.format(max)}</div>
+          ${flatish ? '' : `<div class="chart-lo">${money.format(min)}</div>`}
+          <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Price history chart from ${firstDate} to ${lastDate}">
             <defs>
               <linearGradient id="fill-${id}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.35"/>
+                <stop offset="0%" class="chart-stop-hi" stop-opacity="0.32"/>
                 <stop offset="100%" class="chart-stop-lo" stop-opacity="0"/>
               </linearGradient>
             </defs>
             <line class="chart-grid" x1="0" y1="${H - PAD_BOTTOM}" x2="${W}" y2="${H - PAD_BOTTOM}"/>
-            <path class="chart-area" d="${areaPath}" fill="url(#fill-${id})"/>
+            <line class="chart-grid chart-grid-hi" x1="0" y1="${PAD_TOP}" x2="${W}" y2="${PAD_TOP}"/>
+            ${flatish ? '' : `<path class="chart-area" d="${areaPath}" fill="url(#fill-${id})"/>`}
             <path class="chart-line" d="${linePath}" pathLength="1"/>
             ${minIdx !== maxIdx ? dot(minIdx, 'lo') : ''}
             ${minIdx !== maxIdx ? dot(maxIdx, 'hi') : ''}
-            <line class="chart-cross" x1="0" y1="${PAD_TOP - 8}" x2="0" y2="${H - PAD_BOTTOM}" style="display:none"/>
+            <line class="chart-cross" x1="0" y1="${PAD_TOP - 10}" x2="0" y2="${H - PAD_BOTTOM}" style="display:none"/>
             <circle class="chart-hover-dot" r="4" style="display:none"/>
           </svg>
+          <div class="chart-axis"><span>${firstDate}</span><span>${lastDate}</span></div>
           <div class="chart-tip" style="display:none"></div>
         </div>`;
 };
@@ -346,6 +381,11 @@ export async function writeReports({ root, config, results, historyPath }) {
       : null;
     const rec = recommendationFor(r, analysis, product);
     const deliverable = r.deliverable !== false;
+    const targetNet = r.targets?.netWithExchange ?? null;
+    const netNow = r.netWithExchange ?? r.effectivePrice;
+    const targetReached = Boolean(targetNet && netNow && netNow <= targetNet);
+    const targetGap = targetNet && netNow ? netNow - targetNet : null;
+    const targetPct = targetNet && netNow ? Math.max(4, Math.min(100, Math.round((targetNet / netNow) * 100))) : null;
 
     return `
         <div class="card ${r.site === bestDealId ? 'card-best' : ''}">
@@ -365,6 +405,15 @@ export async function writeReports({ root, config, results, historyPath }) {
             }</div>
             ${chart(entries, `${product.id}-${r.site}`)}
             ${rec ? `<div class="rec rec-${rec.kind}">${rec.kind === 'buy' ? '🟢' : rec.kind === 'watch' ? '🟡' : '🔵'} ${rec.text}</div>` : ''}
+            ${
+              targetNet
+                ? `
+            <div class="target-block">
+              <div class="target-label"><span>Your target: ${money.format(targetNet)}</span><span>${targetReached ? '✓ hit' : `${money.format(targetGap)} away`}</span></div>
+              <div class="target-bar"><div class="target-fill ${targetReached ? 'hit' : ''}" style="width:${targetPct}%"></div></div>
+            </div>`
+                : ''
+            }
             <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">${r.netWithExchange ? money.format(r.netWithExchange) : 'N/A'}</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${r.maxBankOffer ? money.format(r.maxBankOffer) : 'None'}</span></div>
             <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">${r.exchangeCeiling ? money.format(r.exchangeCeiling) : 'N/A'}</span></div>
@@ -520,7 +569,7 @@ export async function writeReports({ root, config, results, historyPath }) {
     .badge-ok { background: rgba(74, 222, 128, 0.14); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.3); }
     .badge-error { background: rgba(248, 113, 113, 0.14); color: var(--error); border: 1px solid rgba(248, 113, 113, 0.3); }
     .badge-best { background: rgba(251, 191, 36, 0.16); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.35); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
     .card {
       background: linear-gradient(155deg, var(--glass-strong) 0%, var(--glass) 55%, rgba(255,255,255,0.03) 100%);
       border: 1px solid var(--glass-border); border-radius: 1.25rem; padding: 1.5rem;
@@ -547,12 +596,27 @@ export async function writeReports({ root, config, results, historyPath }) {
     .rec-buy { background: rgba(74, 222, 128, 0.10); border: 1px solid rgba(74, 222, 128, 0.35); color: var(--success); }
     .rec-wait { background: rgba(125, 211, 252, 0.08); border: 1px solid rgba(125, 211, 252, 0.3); color: var(--accent); }
     .rec-watch { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3); color: var(--warning); }
+    .target-block { margin: 0.1rem 0 0.75rem; }
+    .target-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-bottom: 0.3rem; gap: 0.5rem; }
+    .target-bar { height: 7px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.35); }
+    .target-fill {
+      height: 100%; border-radius: 9999px; width: 0;
+      background: linear-gradient(90deg, rgba(125, 211, 252, 0.9), rgba(56, 189, 248, 0.7));
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      animation: bar-fill 1s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    .target-fill.hit { background: linear-gradient(90deg, rgba(74, 222, 128, 0.9), rgba(34, 197, 94, 0.75)); box-shadow: 0 0 10px rgba(74, 222, 128, 0.55); }
+    @keyframes bar-fill { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
     .detail-row { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .detail-row:last-child { border-bottom: none; }
     .detail-label { color: var(--muted); white-space: nowrap; }
     .detail-value { font-weight: 500; text-align: right; }
     .chart-wrap { position: relative; margin: 0.85rem 0 0.35rem; cursor: crosshair; }
-    .chart-wrap svg { display: block; width: 100%; height: 64px; }
+    .chart-wrap svg { display: block; width: 100%; height: auto; }
+    .chart-hi, .chart-lo { position: absolute; right: 2px; font-size: 0.62rem; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; pointer-events: none; }
+    .chart-hi { top: 2px; }
+    .chart-lo { bottom: 20px; }
+    .chart-axis { display: flex; justify-content: space-between; margin-top: 0.15rem; font-size: 0.66rem; color: var(--muted); }
     .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: chart-draw 1.4s cubic-bezier(.4,0,.2,1) forwards; }
     [data-variant="success"] .chart-line { stroke: var(--success); }
     [data-variant="error"] .chart-line { stroke: var(--error); }
@@ -561,7 +625,8 @@ export async function writeReports({ root, config, results, historyPath }) {
     [data-variant="error"] .chart-stop-hi { stop-color: var(--error); }
     [data-variant="error"] .chart-stop-lo { stop-color: var(--error); }
     .chart-area { opacity: 0; animation: chart-fade 0.9s ease 0.55s forwards; }
-    .chart-grid { stroke: rgba(255,255,255,0.08); stroke-width: 1; stroke-dasharray: 3 4; }
+    .chart-grid { stroke: rgba(255,255,255,0.07); stroke-width: 1; stroke-dasharray: 3 4; }
+    .chart-grid-hi { stroke: rgba(255,255,255,0.04); }
     .chart-dot { stroke: rgba(10, 16, 32, 0.9); stroke-width: 1.5; opacity: 0; animation: chart-fade 0.5s ease 1s forwards; }
     .chart-dot[data-cls="lo"] { fill: var(--success); }
     .chart-dot[data-cls="hi"] { fill: var(--error); }
@@ -649,7 +714,7 @@ export async function writeReports({ root, config, results, historyPath }) {
           ${products.map((product) => `<option value="${product.id}">${product.shortName}</option>`).join('')}
         </select>
       </div>
-      <div class="subtitle">Last updated: <strong>${istTime(now)}</strong> IST</div>
+      <div class="subtitle">Last updated: <strong>${istTime(now)}</strong> IST · refresh in <span id="refresh-count">5:00</span></div>
     </div>
   </header>
 
@@ -688,6 +753,18 @@ export async function writeReports({ root, config, results, historyPath }) {
 
   <script>
     (function () {
+      const el = document.getElementById('refresh-count');
+      if (!el) return;
+      const limit = 300;
+      const start = Date.now();
+      const tick = function () {
+        const left = Math.max(0, limit - Math.floor((Date.now() - start) / 1000));
+        el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+      };
+      tick();
+      setInterval(tick, 1000);
+    })();
+    (function () {
       const filterEl = document.getElementById('product-filter');
       const blocks = document.querySelectorAll('.product-block');
       const applyFilter = function (value) {
@@ -708,7 +785,7 @@ export async function writeReports({ root, config, results, historyPath }) {
       }
     })();
     (function () {
-      const W = 300, H = 96;
+      const W = 320, H = 100;
       const fmt = (v) => '₹' + v.toLocaleString('en-IN');
       document.querySelectorAll('.chart-wrap').forEach(function (wrap) {
         const svg = wrap.querySelector('svg');
