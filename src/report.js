@@ -13,6 +13,9 @@ const pctStr = (pct) => `${(pct * 100).toFixed(1).replace(/\.0$/, '')}%`;
 const istTime = (iso) =>
   new Date(iso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
+const istDate = (value) =>
+  new Date(value).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' });
+
 const productOf = (entry, products) =>
   products.find((product) => product.id === (entry.product ?? 'iphone17')) ?? null;
 
@@ -396,7 +399,7 @@ export async function writeReports({ root, config, results, historyPath }) {
               return `
             <tr>
               <td><strong>${sale.name}</strong></td>
-              <td>${sale.start} → ${sale.end}</td>
+              <td>${istDate(sale.start)} → ${istDate(sale.end)}</td>
               <td class="${active ? 'sale-active' : ''}">${active ? '🔥 LIVE' : daysAway > 0 ? `in ${daysAway} days` : 'passed'}</td>
               <td>${dropCell}</td>
               <td>${money.format(sale.expectedList)}</td>
@@ -413,11 +416,13 @@ export async function writeReports({ root, config, results, historyPath }) {
 
   const productSectionHtml = state
     .map(({ product, sorted, analysis, bestDealId }) => `
+    <div class="product-block" data-product="${product.id}">
     <h2 class="product-heading">📱 ${product.name}${product.id === 'iphone17' ? ' <span class="primary-tag">your target</span>' : ' <span class="watch-tag">watching</span>'}</h2>
     <div class="grid">
       ${sorted.map((r) => cardHtml(product, r, analysis, bestDealId)).join('')}
     </div>
-    ${analyserSectionHtml(product, analysis)}`)
+    ${analyserSectionHtml(product, analysis)}
+    </div>`)
     .join('\n');
 
   const htmlContent = `<!DOCTYPE html>
@@ -478,6 +483,31 @@ export async function writeReports({ root, config, results, historyPath }) {
     .primary-tag { background: rgba(251, 191, 36, 0.18); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.35); }
     .watch-tag { background: rgba(148, 163, 184, 0.12); color: var(--muted); border: 1px solid rgba(148, 163, 184, 0.25); }
     .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.55rem; }
+    .filter-row { display: flex; align-items: center; gap: 0.6rem; }
+    .filter-label { color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .filter-select {
+      appearance: none; -webkit-appearance: none; outline: none; cursor: pointer;
+      color: var(--text); font-size: 0.92rem; font-weight: 600;
+      padding: 0.5rem 2.3rem 0.5rem 0.95rem; border-radius: 0.8rem;
+      border: 1px solid var(--glass-border);
+      background-color: rgba(255,255,255,0.05);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239aa8bd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+      background-repeat: no-repeat, no-repeat;
+      background-position: right 0.85rem center, 0 0;
+      background-size: 0.75rem 0.5rem, 100% 100%;
+      backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+      box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 16px rgba(2, 6, 23, 0.35);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .filter-select:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+    .filter-select:focus { border-color: rgba(125, 211, 252, 0.55); box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.15), inset 0 1px 0 var(--glass-highlight); }
+    .filter-select option { background: #101a30; color: var(--text); }
+    .product-block { animation: block-in 0.3s ease; }
+    .product-block.hidden { display: none; }
+    @keyframes block-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     .banner {
       padding: 0.85rem 1.25rem; border-radius: 1rem; margin-bottom: 1.25rem; font-size: 0.95rem;
       backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%);
@@ -587,6 +617,9 @@ export async function writeReports({ root, config, results, historyPath }) {
     @media (max-width: 640px) {
       body { padding: 1rem; }
       header { flex-direction: column; align-items: flex-start; gap: 0.4rem; padding: 1rem 1.15rem; }
+      .header-right { align-items: flex-start; width: 100%; }
+      .filter-row { width: 100%; }
+      .filter-select { flex: 1; }
       h1 { font-size: 1.35rem; }
       h2 { font-size: 1.1rem; }
       .product-heading { font-size: 1.15rem; padding: 0.65rem 1rem; }
@@ -608,7 +641,16 @@ export async function writeReports({ root, config, results, historyPath }) {
       <h1>📱 Price Monitor — iPhone 17 · Galaxy S25 · S26</h1>
       <div class="subtitle">Pincode: <strong>${config.pincode}</strong> | iPhone net assumes M35 exchange <strong>${money.format(products[0].assumedExchangeValue)}</strong> | Cards sorted by lowest price you can actually buy at</div>
     </div>
-    <div class="subtitle">Last updated: <strong>${istTime(now)}</strong> IST</div>
+    <div class="header-right">
+      <div class="filter-row">
+        <span class="filter-label">Show</span>
+        <select id="product-filter" class="filter-select" aria-label="Filter by phone">
+          <option value="all">All phones</option>
+          ${products.map((product) => `<option value="${product.id}">${product.shortName}</option>`).join('')}
+        </select>
+      </div>
+      <div class="subtitle">Last updated: <strong>${istTime(now)}</strong> IST</div>
+    </div>
   </header>
 
   ${bannerHtml}
@@ -645,6 +687,26 @@ export async function writeReports({ root, config, results, historyPath }) {
   </section>
 
   <script>
+    (function () {
+      const filterEl = document.getElementById('product-filter');
+      const blocks = document.querySelectorAll('.product-block');
+      const applyFilter = function (value) {
+        blocks.forEach(function (block) {
+          block.classList.toggle('hidden', value !== 'all' && block.getAttribute('data-product') !== value);
+        });
+      };
+      let saved = 'all';
+      try { saved = localStorage.getItem('priceFilter') || 'all'; } catch (e) {}
+      if (filterEl) {
+        if (![...filterEl.options].some(function (o) { return o.value === saved; })) saved = 'all';
+        filterEl.value = saved;
+        applyFilter(saved);
+        filterEl.addEventListener('change', function () {
+          applyFilter(filterEl.value);
+          try { localStorage.setItem('priceFilter', filterEl.value); } catch (e) {}
+        });
+      }
+    })();
     (function () {
       const W = 300, H = 96;
       const fmt = (v) => '₹' + v.toLocaleString('en-IN');
