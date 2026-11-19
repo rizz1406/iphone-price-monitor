@@ -55,7 +55,8 @@
         "listPrice": 84999,
         "effectivePrice": 80000,
         "netWithExchange": 74000
-      }
+      },
+      "checkoutPrice": 89100
     },
     {
       "site": "croma",
@@ -116,7 +117,8 @@
         "listPrice": 84999,
         "effectivePrice": 84999,
         "netWithExchange": 78449
-      }
+      },
+      "checkoutPrice": 93990
     },
     {
       "site": "amazon",
@@ -146,7 +148,8 @@
         "listPrice": 89999,
         "effectivePrice": 89900,
         "netWithExchange": 79900
-      }
+      },
+      "checkoutPrice": 94490
     },
     {
       "site": "flipkart",
@@ -185,7 +188,8 @@
         "listPrice": 85999,
         "effectivePrice": 83999,
         "netWithExchange": 83999
-      }
+      },
+      "checkoutPrice": 87999
     },
     {
       "site": "amazon",
@@ -215,7 +219,8 @@
         "listPrice": 99999,
         "effectivePrice": 83999,
         "netWithExchange": 83999
-      }
+      },
+      "checkoutPrice": 87999
     },
     {
       "site": "flipkart",
@@ -254,7 +259,8 @@
         "listPrice": 59999,
         "effectivePrice": 58999,
         "netWithExchange": 58999
-      }
+      },
+      "checkoutPrice": 72999
     }
   ]
 }

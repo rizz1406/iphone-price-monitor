@@ -1,42 +1,65 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Target Pincode:** `500055` | **Updated:** 20 Nov 2026, 1:43 am IST
+**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 1:45 am IST
 
 ## iPhone 17 256GB Mist Blue
 
-| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net (w/ ₹5000 exchange) | Delivery |
+| Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | ✅ Yes | **₹85,100** | ₹89,100 | ₹4,000 (Flipkart Axis) | **₹80,100** | Sunday, 22 Nov |
-| 2 | [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | ✅ Yes | **₹93,990** | ₹93,990 | ₹10,000 (HSBC TAJ Bank Credit Card EMI) | **₹88,990** | 21st November, 2026 |
-| 3 | [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | ✅ Yes | **₹94,490** | ₹94,490 | None | **₹94,490** | N/A |
-| 4 | **Croma** | - | ❌ Error (last good: see dashboard) | - | - | - | - |
+| [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | WAIT ★ | ✅ Yes | **₹89,100** | — | ₹4,000 | — | 20 Nov 2026, 1:41 am |
+| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ✅ Yes | **₹93,990** | — | ₹10,000 | — | 20 Nov 2026, 1:42 am |
+| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ colour unverified | **₹94,490** | — | — | — | 20 Nov 2026, 1:42 am |
+| [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | — | ❌ Error | last known: see dashboard | — | — | — | — |
 
-### 🛒 Sales Analyser
-- Current best buyable: Flipkart net ₹80,100
-- 💰 **Christmas / Year-End Sale** (30 days): expected list ~₹69,300 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹60,300 — **WORTH WAITING — saves ~₹19,800**
-- 💰 **Republic Day Sale** (58 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹56,700 — **WORTH WAITING — saves ~₹23,400**
-- 💰 **Valentine's Day Sale** (82 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹56,700 — **WORTH WAITING — saves ~₹23,400**
+### 📈 Forecast
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 108 over 6 unique days
+- Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
+- Only 6 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- **Conservative:** ₹89,100 – ₹95,000 (price holds near its recent level)
+- **Expected:** ₹88,900 – ₹89,100 (reverts toward the observed low)
+- **Aggressive:** ₹86,200 – ₹88,900 (below anything observed so far — low probability, not evidence-based)
+- Method: illustrative — observed range with wide uncertainty
+- Upcoming sales (dates estimated, not retailer-confirmed):
+  - **Black Friday / Cyber Monday**: 27 Nov 2026 → 30 Nov 2026 (7 days) — Recurring international event; Indian retailer participation unconfirmed for 2026
+  - **Christmas / Year-End Sale**: 20 Dec 2026 → 1 Jan 2027 (30 days) — Typical Amazon.in / Flipkart year-end window in recent years; 2026 dates not yet announced
+  - **Republic Day Sale**: 17 Jan 2027 → 26 Jan 2027 (58 days) — Typical Amazon Great Republic Day / Flipkart Republic Day window; 2027 dates not yet announced
+  - **Valentine's Day Sale**: 10 Feb 2027 → 16 Feb 2027 (82 days) — Recurring pattern; unconfirmed for 2027
+- All ranges are checkout price without exchange or unverified bank offers.
 
 ## Galaxy S26 256GB
 
-| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
+| Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | ✅ Yes | **₹83,999** | ₹87,999 | ₹4,000 (Flipkart Axis) | **₹83,999** | Tuesday, 24 Nov |
-| 2 | [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | ✅ Yes | **₹87,999** | ₹87,999 | None | **₹87,999** | Tuesday, 24 N |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | WAIT ★ | ✅ Yes | **₹87,999** | — | ₹4,000 | — | 20 Nov 2026, 1:42 am |
+| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT | ✅ Yes | **₹87,999** | — | — | — | 20 Nov 2026, 1:43 am |
 
-### 🛒 Sales Analyser
-- Current best buyable: Flipkart net ₹83,999
-- 💰 **Christmas / Year-End Sale** (30 days): expected list ~₹69,300 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹65,300 — **WORTH WAITING — saves ~₹18,699**
-- 💰 **Republic Day Sale** (58 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,700 — **WORTH WAITING — saves ~₹22,299**
-- 💰 **Valentine's Day Sale** (82 days): expected list ~₹65,700 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹61,700 — **WORTH WAITING — saves ~₹22,299**
+### 📈 Forecast
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 91 over 4 unique days
+- Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
+- Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- **Conservative:** ₹88,000 – ₹88,000 (price holds near its recent level)
+- **Expected:** ₹88,000 – ₹88,000 (reverts toward the observed low)
+- **Aggressive:** ₹85,400 – ₹88,000 (below anything observed so far — low probability, not evidence-based)
+- Method: illustrative — observed range with wide uncertainty
+- Upcoming sales (dates estimated, not retailer-confirmed):
+  - **Christmas / Year-End Sale**: 20 Dec 2026 → 1 Jan 2027 (30 days) — Typical year-end window; 2026 dates not yet announced
+  - **Republic Day Sale**: 17 Jan 2027 → 26 Jan 2027 (58 days) — Typical Republic Day window; 2027 dates not yet announced
+- All ranges are checkout price without exchange or unverified bank offers.
 
 ## Galaxy S25 256GB
 
-| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
+| Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹58,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹58,349** | Tomorrow, 11 PM |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | STRONG DEAL ★ | ✅ Yes | **₹72,999** | — | ₹3,650 | — | 20 Nov 2026, 1:43 am |
 
-### 🛒 Sales Analyser
-- Current best buyable: Flipkart net ₹58,349
-- 🤔 **Christmas / Year-End Sale** (30 days): expected list ~₹58,999 · drop 5% (estimate, self-calibrates when the sale starts) · predicted net ~₹55,349 — **MARGINAL — saves ~₹3,000**
-- 💰 **Republic Day Sale** (58 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹6,000**
-- 💰 **Valentine's Day Sale** (82 days): expected list ~₹55,999 · drop 10% (estimate, self-calibrates when the sale starts) · predicted net ~₹52,349 — **WORTH WAITING — saves ~₹6,000**
+### 📈 Forecast
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 91 over 4 unique days
+- Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
+- Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- **Conservative:** ₹73,000 – ₹73,000 (price holds near its recent level)
+- **Expected:** ₹73,000 – ₹73,000 (reverts toward the observed low)
+- **Aggressive:** ₹70,800 – ₹73,000 (below anything observed so far — low probability, not evidence-based)
+- Method: illustrative — observed range with wide uncertainty
+- Upcoming sales (dates estimated, not retailer-confirmed):
+  - **Christmas / Year-End Sale**: 20 Dec 2026 → 1 Jan 2027 (30 days) — Typical year-end window; 2026 dates not yet announced
+  - **Republic Day Sale**: 17 Jan 2027 → 26 Jan 2027 (58 days) — Typical Republic Day window; 2027 dates not yet announced
+- All ranges are checkout price without exchange or unverified bank offers.

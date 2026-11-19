@@ -6,7 +6,8 @@
   "scripts": {
     "monitor": "node --env-file-if-exists=.env src/monitor.js",
     "monitor:summary": "node --env-file-if-exists=.env src/monitor.js --summary",
-    "dashboard": "node --env-file-if-exists=.env src/report.js"
+    "dashboard": "node --env-file-if-exists=.env src/report.js",
+    "test": "node --test"
   },
   "dependencies": {
     "playwright": "1.65.0"

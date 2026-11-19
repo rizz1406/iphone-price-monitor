@@ -2,12 +2,14 @@ import { chromium } from 'playwright';
 import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { writeReports } from './report.js';
+import { checkoutOf, evaluateAlerts, identityCheck, purchaseState } from './pricing.js';
 
 const root = process.cwd();
 const config = JSON.parse(await readFile(path.join(root, 'config.json'), 'utf8'));
 const dataDir = path.join(root, 'data');
 const historyPath = path.join(dataDir, 'history.jsonl');
 const latestPath = path.join(dataDir, 'latest.json');
+const alertStatePath = path.join(dataDir, 'alert-state.json');
 const errorDir = path.join(dataDir, 'errors');
 const summaryOnly = process.argv.includes('--summary');
 const debug = process.env.DEBUG === 'true';
@@ -162,12 +164,13 @@ const extractFlipkartOnce = async (page, site, product) => {
     toNumber(text.match(/(\d+)%\s*\n\s*[\d,]+\s*\n\s*₹([\d,]+)/)?.[2]) ??
     toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Flipkart price (page may be bot-walled or not fully loaded)');
-  const effectivePrice =
-    toNumber(text.match(/Buy at ₹([\d,]+)/i)?.[1]) ??
-    (listPrice && maxBankOffer ? Math.max(0, listPrice - maxBankOffer) : listPrice);
   const exchangeCeiling = toNumber(text.match(/Exchange offer\s*\nUp to ₹([\d,]+)/i)?.[1]) ?? null;
-  const exchangeAvailable = !/Not available at this Pincode/i.test(text);
+  const exchangeAvailable = /Exchange offer/i.test(text) && !/Not available at this Pincode/i.test(text);
   const cod = /No cash\s*on delivery/i.test(text) ? false : /Cash on\s*Delivery/i.test(text) ? true : null;
+  const negativeDelivery = /Not available at this Pincode|Not Available for your pincode/i.test(text);
+  // Delivery is only "verified" when the 500055 pincode was actually applied on the page.
+  const deliverable = negativeDelivery ? false : pincodeSet ? true : null;
+  const inStock = !/Sold out|Currently unavailable|Out of stock/i.test(text);
 
   return {
     site: site.id,
@@ -178,29 +181,35 @@ const extractFlipkartOnce = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
+    mrp: null,
     listPrice,
-    effectivePrice,
+    checkoutPrice: listPrice,
+    effectivePrice: listPrice,
     maxBankOffer,
     bankOffers,
+    bankOffersDetailed: bankOffers.map((bankOffer) => ({
+      bank: bankOffer.bank,
+      amount: bankOffer.amount,
+      minTxn: null,
+      eligibility: 'unknown',
+      verified: false,
+      expires: null,
+    })),
     bankOfferKind: 'instant',
+    qualifiedPrice: null,
     exchangeCeiling,
     exchangeAvailable,
-    assumedExchangeValue: product.assumedExchangeValue,
-    netWithExchange:
-      effectivePrice && product.assumedExchangeValue
-        ? Math.max(0, effectivePrice - product.assumedExchangeValue)
-        : effectivePrice,
+    assumedExchangeValue: product.assumedExchangeValue ?? 0,
+    exchangeAdjustedPrice: product.assumedExchangeValue
+      ? Math.max(0, listPrice - product.assumedExchangeValue)
+      : null,
     seller: text.match(/Seller:\s*([^\n]+)/i)?.[1]?.trim() ?? null,
     delivery: text.match(/Delivery by\s*\n?\s*([^\n]+)/i)?.[1]?.trim() ?? null,
-    inStock: !/Sold out|Currently unavailable|Out of stock/i.test(text),
-    deliverable: !/Not available at this Pincode|Not Available for your pincode/i.test(text),
+    deliveryNote: deliverable === null ? 'pincode 500055 not confirmed on page' : null,
+    inStock,
+    deliverable,
     cod,
     pincodeSet,
-    targets: {
-      listPrice: site.targetListPrice,
-      effectivePrice: site.targetEffectivePrice,
-      netWithExchange: site.targetNetWithExchange,
-    },
   };
 };
 
@@ -253,7 +262,9 @@ const extractCroma = async (page, site, product) => {
   const offer = getOffer(jsonLd);
   const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Croma price');
-  const deliverable = !/Not Available for your pincode/i.test(text);
+  const pincodeSet = text.includes(config.pincode);
+  const negativeDelivery = /Not Available for your pincode/i.test(text);
+  const deliverable = negativeDelivery ? false : pincodeSet ? true : null;
 
   return {
     site: site.id,
@@ -264,28 +275,28 @@ const extractCroma = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
+    mrp: null,
     listPrice,
+    checkoutPrice: listPrice,
     effectivePrice: listPrice,
     maxBankOffer: null,
     bankOffers: [],
+    bankOffersDetailed: [],
     bankOfferKind: 'none',
+    qualifiedPrice: null,
     exchangeCeiling: null,
     exchangeAvailable: false,
     assumedExchangeValue: null,
-    netWithExchange: listPrice,
+    exchangeAdjustedPrice: null,
     seller: 'Croma',
     delivery: deliverable
       ? text.match(/Delivery by\s*([^\n]+)/i)?.[1]?.trim() ?? null
       : `Not available for ${config.pincode}`,
+    deliveryNote: deliverable === null ? 'pincode 500055 not confirmed on page' : null,
     inStock: /Add to Cart|Buy Now/i.test(text) && !/Out of Stock|Sold Out/i.test(text),
     deliverable,
     cod: null,
-    pincodeSet: text.includes(config.pincode),
-    targets: {
-      listPrice: site.targetListPrice,
-      effectivePrice: site.targetEffectivePrice,
-      netWithExchange: site.targetNetWithExchange,
-    },
+    pincodeSet,
   };
 };
 
@@ -302,6 +313,8 @@ const extractVijay = async (page, site, product) => {
   if (!listPrice) throw new Error('Could not extract Vijay Sales price');
   const bankOffers = parseVijayOffers(text);
   const maxBankOffer = bankOffers[0]?.amount ?? null;
+  const pincodeSet = text.includes(config.pincode);
+  const inStock = /In stock/i.test(text) && !/Out of Stock|Sold Out|Currently Unavailable/i.test(text);
 
   return {
     site: site.id,
@@ -312,28 +325,36 @@ const extractVijay = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
+    mrp: null,
     listPrice,
+    checkoutPrice: listPrice,
     effectivePrice: listPrice,
     maxBankOffer,
     bankOffers,
+    bankOffersDetailed: bankOffers.map((bankOffer) => ({
+      bank: bankOffer.bank,
+      amount: bankOffer.amount,
+      minTxn: null,
+      eligibility: 'unknown',
+      verified: false,
+      expires: null,
+      kind: 'emi',
+    })),
     bankOfferKind: 'emi',
+    qualifiedPrice: null,
     exchangeCeiling: null,
     exchangeAvailable: /Exchange Bonus/i.test(text),
-    assumedExchangeValue: product.assumedExchangeValue,
-    netWithExchange: listPrice && product.assumedExchangeValue
+    assumedExchangeValue: product.assumedExchangeValue ?? 0,
+    exchangeAdjustedPrice: product.assumedExchangeValue
       ? Math.max(0, listPrice - product.assumedExchangeValue)
-      : listPrice,
+      : null,
     seller: 'Vijay Sales',
     delivery: text.match(/Free delivery by\s*([^\n]+)/i)?.[1]?.trim() ?? null,
-    inStock: /In stock/i.test(text) && !/Out of Stock|Sold Out/i.test(text),
-    deliverable: !/Out of Stock|Sold Out|Currently Unavailable/i.test(text),
+    deliveryNote: pincodeSet ? null : 'delivery not verified for pincode 500055',
+    inStock,
+    deliverable: pincodeSet ? inStock : null,
     cod: null,
-    pincodeSet: text.includes(config.pincode),
-    targets: {
-      listPrice: site.targetListPrice,
-      effectivePrice: site.targetEffectivePrice,
-      netWithExchange: site.targetNetWithExchange,
-    },
+    pincodeSet,
   };
 };
 
@@ -375,6 +396,14 @@ const extractAmazon = async (page, site, product) => {
   const listPrice = offerPrice(offer) ?? domPrice ?? toNumber(text.match(/₹\s?([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Amazon price');
   const inStock = /In stock/i.test(text) || (await page.locator('#add-to-cart-button').count()) > 0;
+  const mrp =
+    toNumber(
+      await page
+        .locator('#corePriceDisplay_desktop_feature_div .basisPrice .a-offscreen, #corePrice_desktop .basisPrice .a-offscreen')
+        .first()
+        .innerText({ timeout: 3000 })
+        .catch(() => null)
+    ) ?? parseInr(text.match(/M\.R\.P\.?:?\s*₹\s?([\d,]+)/)?.[1]);
   const exchangeCeiling = toNumber(text.match(/up to ₹\s?([\d,]+)(?:\.00)?\s*off/i)?.[1]) ?? null;
 
   return {
@@ -386,26 +415,26 @@ const extractAmazon = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('#productTitle').first().innerText().catch(() => jsonLd?.name ?? ''),
+    mrp: mrp && mrp > listPrice ? mrp : null,
     listPrice,
+    checkoutPrice: listPrice,
     effectivePrice: listPrice,
     maxBankOffer: null,
     bankOffers: [],
+    bankOffersDetailed: [],
     bankOfferKind: 'none',
+    qualifiedPrice: null,
     exchangeCeiling,
     exchangeAvailable: false,
-    assumedExchangeValue: product.assumedExchangeValue,
-    netWithExchange: listPrice,
+    assumedExchangeValue: product.assumedExchangeValue ?? 0,
+    exchangeAdjustedPrice: null,
     seller: text.match(/Sold by\s*([^\n]+)/i)?.[1]?.trim() ?? 'Amazon',
     delivery: text.match(/(?:FREE delivery|Delivery)[^\n]*([A-Z][a-z]+,?\s+\d+\s+[A-Z]+)/)?.[1]?.trim() ?? null,
+    deliveryNote: 'Amazon does not expose pincode serviceability without login — verify at checkout',
     inStock,
-    deliverable: inStock,
+    deliverable: null,
     cod: null,
     pincodeSet: false,
-    targets: {
-      listPrice: site.targetListPrice,
-      effectivePrice: site.targetEffectivePrice,
-      netWithExchange: site.targetNetWithExchange,
-    },
   };
 };
 
@@ -427,92 +456,123 @@ const readPrevious = async () => {
   }
 };
 
-const calculateReasons = (result, previous) => {
-  const reasons = [];
-  if (result.status === 'error') {
-    // One-off flakes are common (bot walls); only alert once a site has failed
-    // two runs in a row (~35+ min of real downtime).
-    if (previous?.status === 'error') reasons.push('site check failed');
-    return reasons;
+const readAlertState = async () => {
+  try {
+    return JSON.parse(await readFile(alertStatePath, 'utf8'));
+  } catch {
+    return {};
   }
-  if (!previous) {
-    reasons.push('first successful check');
-    return reasons;
-  }
-  if (previous.status === 'error') reasons.push('site recovered');
-  if (result.listPrice && result.targets.listPrice && result.listPrice <= result.targets.listPrice) {
-    if (!previous.listPrice || previous.listPrice > result.targets.listPrice) {
-      reasons.push(`list price hit target ${money.format(result.targets.listPrice)}`);
-    }
-  }
-  if (result.effectivePrice && result.targets.effectivePrice && result.effectivePrice <= result.targets.effectivePrice) {
-    if (!previous.effectivePrice || previous.effectivePrice > result.targets.effectivePrice) {
-      reasons.push(`effective price hit target ${money.format(result.targets.effectivePrice)}`);
-    }
-  }
-  if (result.netWithExchange && result.targets.netWithExchange && result.netWithExchange <= result.targets.netWithExchange) {
-    if (!previous.netWithExchange || previous.netWithExchange > result.targets.netWithExchange) {
-      reasons.push(`net-with-exchange hit target ${money.format(result.targets.netWithExchange)}`);
-    }
-  }
-  if (result.effectivePrice && previous.effectivePrice && result.effectivePrice < previous.effectivePrice) {
-    reasons.push(`new low ${money.format(result.effectivePrice)}`);
-  }
-  if (
-    result.bankOfferKind !== 'emi' &&
-    result.maxBankOffer &&
-    result.maxBankOffer > (previous.maxBankOffer ?? 0)
-  ) {
-    reasons.push(`bank offer increased to ${money.format(result.maxBankOffer)}`);
-  }
-  if (typeof previous.inStock === 'boolean' && previous.inStock !== result.inStock) {
-    reasons.push(result.inStock ? 'back in stock' : 'out of stock');
-  }
-  if (previous.seller && result.seller && previous.seller !== result.seller) {
-    reasons.push(`seller changed to ${result.seller}`);
-  }
-  if (result.deliverable === false && reasons.length) {
-    reasons.push(`not deliverable at pincode ${config.pincode}`);
-  }
-  return reasons;
 };
+
+const saleWindow = (sale) => ({
+  name: sale.name,
+  start: new Date(`${sale.start}T00:00:00+05:30`),
+  end: new Date(`${sale.end}T23:59:59+05:30`),
+  dateConfidence: sale.dateConfidence ?? 'estimated',
+  source: sale.source ?? null,
+});
+
+const activeSalesFor = (product, now = new Date()) =>
+  (product.saleCalendar ?? [])
+    .map(saleWindow)
+    .filter((sale) => now >= sale.start && now <= sale.end);
+
+// Attach identity verification + purchasability to a successful scrape.
+const enrichResult = (result, product) => {
+  if (result.status !== 'ok') return result;
+  const price = checkoutOf(result);
+  const enriched = {
+    ...result,
+    title: result.title ?? '',
+    checkoutPrice: price,
+    effectivePrice: price,
+    verifiedAt: result.checkedAt,
+    identity: identityCheck(result, product),
+  };
+  enriched.purchase = purchaseState(enriched, config);
+  return enriched;
+};
+
+const BLOCKER_TEXT = {
+  SCRAPE_FAILED: 'scrape failed',
+  PRICE_UNVERIFIED: 'price unverified',
+  PRICE_SUSPICIOUS: 'price looks wrong',
+  OUT_OF_STOCK: 'out of stock',
+  STOCK_UNVERIFIED: 'stock unverified',
+  NOT_DELIVERABLE: `not deliverable to ${config.pincode}`,
+  DELIVERY_UNVERIFIED: 'delivery unverified',
+  STORAGE_MISMATCH: 'storage mismatch',
+  COLOR_UNVERIFIED: 'colour unverified',
+  INVALID_URL: 'listing URL invalid',
+};
+
+const availabilityText = (result) => {
+  if (result.status === 'error') return `ERROR: ${result.error}`;
+  const purchase = result.purchase;
+  if (purchase?.purchasable) return `PURCHASABLE — ${purchase.tier.label}`;
+  const blockers = (purchase?.blockers ?? []).map((blocker) => BLOCKER_TEXT[blocker] ?? blocker);
+  return purchase ? `NOT PURCHASABLE — ${blockers.join(', ')}` : 'UNVERIFIED';
+};
+
+const istStamp = (iso) =>
+  new Date(iso).toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
 const formatSite = (result) => {
   if (result.status === 'error') {
     return `${result.productName ?? result.name}: ${result.name} ERROR - ${result.error}\n${result.url}`;
   }
+  const target = config.target;
   const lines = [`${result.productName ?? 'iPhone 17'} @ ${result.name}: ${result.title || result.productName}`];
-  lines.push(`List: ${result.listPrice ? money.format(result.listPrice) : 'unknown'}`);
-  if (result.effectivePrice) lines.push(`Effective: ${money.format(result.effectivePrice)}`);
+  const price = checkoutOf(result);
+  lines.push(
+    `Checkout: ${price ? money.format(price) : 'unknown'}${result.mrp ? ` (M.R.P. ${money.format(result.mrp)})` : ''}`
+  );
   if (result.maxBankOffer) {
     const best = result.bankOffers?.[0];
     const label = result.bankOfferKind === 'emi' ? 'Best EMI offer' : 'Best bank offer';
-    lines.push(`${label}: ${money.format(result.maxBankOffer)}${best ? ` (${best.bank})` : ''}`);
+    lines.push(
+      `${label}: ${money.format(result.maxBankOffer)}${best ? ` (${best.bank})` : ''} — eligibility unverified, not included`
+    );
   }
-  if (result.exchangeCeiling) {
-    lines.push(`Exchange ceiling: ${money.format(result.exchangeCeiling)}${result.exchangeAvailable ? '' : ' (not available at this pincode)'}`);
-  }
-  if (result.netWithExchange && result.exchangeAvailable) {
-    lines.push(`Net with assumed exchange ${result.assumedExchangeValue ? money.format(result.assumedExchangeValue) : 'none'}: ${money.format(result.netWithExchange)}`);
+  if (result.assumedExchangeValue && result.exchangeAdjustedPrice) {
+    lines.push(
+      `Exchange (optional): assumed ${money.format(result.assumedExchangeValue)}${result.exchangeCeiling ? ` vs ceiling ${money.format(result.exchangeCeiling)}` : ''} → ${money.format(result.exchangeAdjustedPrice)} after exchange (not a discount)`
+    );
   }
   if (result.seller) lines.push(`Seller: ${result.seller}`);
   if (result.delivery) lines.push(`Delivery: ${result.delivery}`);
-  if (result.cod !== null) lines.push(`COD: ${result.cod ? 'yes' : 'no'}`);
-  lines.push(
-    `Target: list <= ${money.format(result.targets.listPrice)} | net <= ${money.format(result.targets.netWithExchange)}`
-  );
+  if (result.deliveryNote) lines.push(`Note: ${result.deliveryNote}`);
+  if (result.cod !== null && result.cod !== undefined) lines.push(`COD: ${result.cod ? 'yes' : 'no'}`);
+  lines.push(`Availability: ${availabilityText(result)}`);
+  if (result.identity) {
+    lines.push(
+      `Identity: storage ${result.identity.storageMatch === false ? 'MISMATCH' : result.identity.storageMatch ? 'ok' : 'n/a'} / colour ${result.identity.colorMatch === false ? 'unverified' : result.identity.colorMatch ? 'ok' : 'n/a'}`
+    );
+  }
+  lines.push(`Target: BUY NOW ≤ ${money.format(target.buyNow)} | STRONG ≤ ${money.format(target.strongDealMax)}`);
+  if (result.verifiedAt) lines.push(`Verified: ${istStamp(result.verifiedAt)} IST`);
   lines.push(result.url);
   return lines.join('\n');
 };
 
-const alertHeadline = (product, reasons) => `${product} — ${reasons[0]}`;
+const alertHeadline = (product, alerts) => {
+  const top = [...alerts].sort((a, b) => b.rank - a.rank)[0];
+  return top ? `${product} — ${top.kind.replace(/_/g, ' ')}: ${top.reason}` : null;
+};
 
 // GitHub Issues as the alert inbox: one issue per change-event. GitHub emails the
 // repo owner automatically. Skipped when GH_TOKEN is absent (local runs).
-const createAlertIssue = async (result, reasons) => {
+const createAlertIssue = async (result, alerts) => {
   const token = process.env.GH_TOKEN;
   const repo = process.env.GITHUB_REPOSITORY;
   if (!token || !repo) return;
+  const top = [...alerts].sort((a, b) => b.rank - a.rank)[0];
   try {
     const response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
       method: 'POST',
@@ -522,8 +582,8 @@ const createAlertIssue = async (result, reasons) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        title: `[Price Alert] ${result.productName ?? result.product} @ ${result.name}`,
-        body: `${formatSite(result)}\n\n**Reasons:** ${reasons.join('; ')}\n\n[Dashboard](https://${repo.split('/')[0]}.github.io/${repo.split('/')[1]}/dashboard.html)`,
+        title: `[${top.kind.replace(/_/g, ' ')}] ${result.productName ?? result.product} @ ${result.name} — ${money.format(top.price)}`,
+        body: `${formatSite(result)}\n\n**Alerts:**\n${alerts.map((alert) => `- **${alert.kind}** — ${alert.reason}`).join('\n')}\n\n[Dashboard](https://${repo.split('/')[0]}.github.io/${repo.split('/')[1]}/dashboard.html)`,
       }),
     });
     if (!response.ok) console.log(`Issue creation failed: HTTP ${response.status}`);
@@ -545,6 +605,21 @@ const main = async () => {
   await mkdir(errorDir, { recursive: true });
   const previousSites = await readPrevious();
   const previousResults = [...previousSites.values()];
+  let historyEntries = [];
+  try {
+    historyEntries = (await readFile(historyPath, 'utf8'))
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {}
+  let alertState = await readAlertState();
   const results = [];
   const alertMessages = [];
   const headlines = [];
@@ -587,11 +662,6 @@ const main = async () => {
           status: 'error',
           error: error.message,
           url: site.url,
-          targets: {
-            listPrice: site.targetListPrice,
-            effectivePrice: site.targetEffectivePrice,
-            netWithExchange: site.targetNetWithExchange,
-          },
         };
       } finally {
         if (debug && result?.status === 'ok') {
@@ -601,16 +671,32 @@ const main = async () => {
         await page.close();
       }
 
-      results.push(result);
-      const reasons = calculateReasons(result, previous);
-      if (reasons.length) {
-        alertMessages.push(`${formatSite(result)}\nReason: ${reasons.join('; ')}`);
-        await createAlertIssue(result, reasons);
-        headlines.push(alertHeadline(result.productName ?? result.product, reasons));
+      const enriched = enrichResult(result, product);
+      results.push(enriched);
+      const { alerts, state } = evaluateAlerts({
+        result: enriched,
+        previous,
+        history: historyEntries,
+        config: { ...config, activeSales: activeSalesFor(product) },
+        state: alertState,
+      });
+      alertState = state;
+      if (alerts.length) {
+        alertMessages.push(
+          ...alerts.map((alert) => `${formatSite(enriched)}\nAlert: ${alert.kind} — ${alert.reason}`)
+        );
+        await createAlertIssue(enriched, alerts);
+        for (const alert of alerts) {
+          const headline = alertHeadline(enriched.productName ?? product.name, [alert]);
+          if (headline) headlines.push(headline);
+        }
       }
       console.log(`\n--- ${result.productName ?? product.name} @ ${site.name} ---`);
-      console.log(formatSite(result));
-      console.log('Reasons:', reasons.length ? reasons.join('; ') : 'none');
+      console.log(formatSite(enriched));
+      console.log(
+        'Alerts:',
+        alerts.length ? alerts.map((alert) => `${alert.kind} (${alert.reason})`).join('; ') : 'none'
+      );
     }
   }
 
@@ -624,6 +710,7 @@ const main = async () => {
   for (const result of results) {
     await appendFile(historyPath, JSON.stringify(result) + '\n');
   }
+  await writeFile(alertStatePath, JSON.stringify(alertState, null, 2)).catch(() => {});
 
   // Commit-message headline: consumed by CI to prefix the bot commit, and cleared
   // every run so a stale flag never survives into the next commit.
@@ -640,12 +727,14 @@ const main = async () => {
       const productResults = results.filter((result) => result.product === product.id);
       lines.push(`== ${product.name} ==`);
       for (const result of productResults) lines.push(formatSite(result), '');
-      const priced = productResults.filter((result) => result.effectivePrice);
-      if (priced.length) {
-        const best = priced.reduce((lowest, result) =>
-          result.effectivePrice < lowest.effectivePrice ? result : lowest
+      const purchasable = productResults.filter((result) => result.purchase?.purchasable);
+      if (purchasable.length) {
+        const best = purchasable.reduce((lowest, result) =>
+          checkoutOf(result) < checkoutOf(lowest) ? result : lowest
         );
-        lines.push(`Best effective: ${best.name} at ${money.format(best.effectivePrice)}`, '');
+        lines.push(`Best verified purchasable: ${best.name} at ${money.format(checkoutOf(best))}`, '');
+      } else {
+        lines.push('No verified purchasable offer (in stock + deliverable + verified identity).', '');
       }
     }
     await notify(lines.join('\n'));

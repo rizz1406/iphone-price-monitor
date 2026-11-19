@@ -1,14 +1,18 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import {
+  checkoutOf,
+  forecastFor,
+  identityCheck,
+  purchaseState,
+} from './pricing.js';
 
 const money = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
   maximumFractionDigits: 0,
 });
-
-const pctStr = (pct) => `${(pct * 100).toFixed(1).replace(/\.0$/, '')}%`;
 
 const istTime = (iso) =>
   new Date(iso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
@@ -22,17 +26,29 @@ const productOf = (entry, products) =>
 const lastKnownGood = (historyEntries, productId, siteId) =>
   [...historyEntries]
     .reverse()
-    .find((entry) => (entry.product ?? 'iphone17') === productId && entry.site === siteId && entry.status === 'ok' && entry.effectivePrice);
+    .find(
+      (entry) =>
+        (entry.product ?? 'iphone17') === productId &&
+        entry.site === siteId &&
+        entry.status === 'ok' &&
+        checkoutOf(entry)
+    );
 
-const historyForSite = (historyEntries, productId, siteId, limit = 24) =>
+const historyForSite = (historyEntries, productId, siteId, limit = 48) =>
   historyEntries
-    .filter((entry) => (entry.product ?? 'iphone17') === productId && entry.site === siteId && entry.status === 'ok' && entry.effectivePrice)
+    .filter(
+      (entry) =>
+        (entry.product ?? 'iphone17') === productId &&
+        entry.site === siteId &&
+        entry.status === 'ok' &&
+        checkoutOf(entry)
+    )
     .slice(-limit);
 
 const trendOf = (entries) => {
   if (entries.length < 4) return 'flat';
   const half = Math.floor(entries.length / 2);
-  const avg = (list) => list.reduce((sum, e) => sum + e.effectivePrice, 0) / list.length;
+  const avg = (list) => list.reduce((sum, entry) => sum + checkoutOf(entry), 0) / list.length;
   const older = avg(entries.slice(0, half));
   const newer = avg(entries.slice(half));
   if (newer < older - 300) return 'down';
@@ -40,11 +56,14 @@ const trendOf = (entries) => {
   return 'flat';
 };
 
+const STALE_MS = 90 * 60000;
+const stale = (iso) => iso && Date.now() - new Date(iso).getTime() > STALE_MS;
+
 // Interactive chart: time-based x-axis, monotone-cubic smoothing (no overshoot on
 // flat plateaus), padded y-domain so flat series still render mid-chart, animated
 // draw-in, min/max dots, axis dates and hover crosshair + tooltip. Inline, no deps.
 const chart = (entries, id) => {
-  const values = entries.map((entry) => entry.effectivePrice);
+  const values = entries.map((entry) => checkoutOf(entry));
   if (values.length < 2) return '';
   const W = 320;
   const H = 100;
@@ -154,129 +173,165 @@ const saleCalendarState = (saleCalendar, now) => {
   };
 };
 
-const bestBuyable = (results) =>
+const BLOCKER_LABELS = {
+  SCRAPE_FAILED: 'scrape failed',
+  PRICE_UNVERIFIED: 'price unverified',
+  PRICE_SUSPICIOUS: 'price looks wrong',
+  OUT_OF_STOCK: 'out of stock',
+  STOCK_UNVERIFIED: 'stock unverified',
+  NOT_DELIVERABLE: 'not deliverable to pincode',
+  DELIVERY_UNVERIFIED: 'delivery unverified',
+  STORAGE_MISMATCH: 'storage mismatch',
+  COLOR_UNVERIFIED: 'colour unverified',
+  INVALID_URL: 'listing URL invalid',
+};
+
+const blockersText = (result) =>
+  (result.purchase?.blockers ?? []).map((blocker) => BLOCKER_LABELS[blocker] ?? blocker).join(', ');
+
+const bestPurchasable = (results) =>
   results
-    .filter((r) => r.status === 'ok' && r.deliverable !== false && r.effectivePrice)
-    .sort((a, b) => a.effectivePrice - b.effectivePrice)[0] ?? null;
+    .filter((result) => result.status === 'ok' && result.purchase?.purchasable && result.checkoutPrice)
+    .sort((a, b) => a.checkoutPrice - b.checkoutPrice)[0] ?? null;
 
-const lowestListRecorded = (historyEntries) => {
-  const ok = historyEntries.filter((entry) => entry.status === 'ok' && entry.listPrice);
-  return ok.length ? Math.min(...ok.map((entry) => entry.listPrice)) : null;
+const statusFor = (result, config) => {
+  if (result.status !== 'ok' || !result.checkoutPrice) return null;
+  const purchase = result.purchase;
+  const target = config.target;
+  if (!purchase?.purchasable) {
+    return { kind: 'blocked', text: `NOT PURCHASABLE — ${blockersText(result)}` };
+  }
+  const price = purchase.price;
+  const gap = price - target.buyNow;
+  if (purchase.tier.tier === 'BUY') {
+    return { kind: 'buy', text: `BUY NOW — checkout ${money.format(price)} is at or below your ${money.format(target.buyNow)} target` };
+  }
+  if (purchase.tier.tier === 'STRONG_DEAL') {
+    return { kind: 'watch', text: `STRONG DEAL — ${money.format(price)}, but still ${money.format(gap)} above the ${money.format(target.buyNow)} target` };
+  }
+  if (purchase.tier.tier === 'WATCH') {
+    return { kind: 'wait', text: `DEAL WATCH — ${money.format(price)}; keep waiting for ≤ ${money.format(target.buyNow)}` };
+  }
+  return { kind: 'wait', text: `WAIT — ${money.format(price)} is ${money.format(gap)} above your ${money.format(target.buyNow)} target` };
 };
 
-// Self-learning: once a sale window has started, the actual lowest list price recorded
-// during the window calibrates the drop estimate. Recorded history is the memory —
-// no config edits needed. Guesses only apply until real sale data exists.
-const learnedSaleData = (historyEntries, sale) => {
-  if (sale.active === false && sale.daysAway > 0) return null;
-  const windowEnd = sale.active ? Date.now() : sale.end.getTime();
-  const inWindow = historyEntries.filter(
-    (entry) => entry.status === 'ok' && entry.listPrice &&
-      new Date(entry.checkedAt).getTime() >= sale.start.getTime() &&
-      new Date(entry.checkedAt).getTime() <= windowEnd,
-  );
-  if (!inWindow.length) return null;
-  const observedMinList = Math.min(...inWindow.map((entry) => entry.listPrice));
-  const before = historyEntries.filter(
-    (entry) => entry.status === 'ok' && entry.listPrice &&
-      new Date(entry.checkedAt).getTime() < sale.start.getTime(),
-  );
-  const baseline = before.length ? Math.min(...before.map((entry) => entry.listPrice)) : null;
-  const observedDropPct = baseline && baseline > observedMinList ? 1 - observedMinList / baseline : null;
-  return { observedMinList, baseline, observedDropPct, samples: inWindow.length };
-};
-
-// Sales analyser: computes expected drop, predicted net, and a worth-waiting verdict.
-const analyseSales = (product, historyEntries, results, saleState) => {
-  const best = bestBuyable(results);
-  const currentBestNet = best ? (best.netWithExchange ?? best.effectivePrice) : null;
-  const currentBestList = best?.listPrice ?? null;
-  const floorList = lowestListRecorded(historyEntries);
-  const threshold = product.worthWaitingSavings ?? 4000;
-
-  const analysed = saleState.all.map((sale) => {
-    const learned = learnedSaleData(historyEntries, sale);
-
-    let expectedList;
-    if (learned?.observedMinList) {
-      // Real sale data exists — the observed price IS ground truth. Never compound the
-      // learned drop % on top of it (that would double-count the discount).
-      expectedList = [sale.expectedListPrice, learned.observedMinList]
-        .filter((value) => value)
-        .sort((a, b) => a - b)[0];
-    } else {
-      // No sale-window data yet — predict from the configured drop % off the recorded floor.
-      const fromDrop = floorList && sale.historicalDropPct
-        ? Math.round((floorList * (1 - sale.historicalDropPct)) / 100) * 100
-        : null;
-      expectedList = [sale.expectedListPrice, fromDrop, currentBestList]
-        .filter((value) => value)
-        .sort((a, b) => a - b)[0] ?? sale.expectedListPrice;
-    }
-
-    // Predicted net subtracts only instant (full-payment) bank offers — EMI-only offers don't reduce the price you pay upfront.
-    const bank = best?.maxBankOffer && best.bankOfferKind !== 'emi' ? best.maxBankOffer : 0;
-    const exchange = best?.exchangeAvailable ? (product.assumedExchangeValue ?? 0) : 0;
-    const predictedNet = expectedList - bank - exchange;
-    const savings = currentBestNet ? currentBestNet - predictedNet : null;
-
-    let verdict;
-    if (sale.active) {
-      verdict = { kind: 'live', text: 'LIVE NOW — buy if net hits your target' };
-    } else if (savings === null) {
-      verdict = { kind: 'unknown', text: 'No baseline yet' };
-    } else if (savings >= threshold) {
-      verdict = { kind: 'worth', text: `WORTH WAITING — saves ~${money.format(savings)}` };
-    } else if (savings >= 1000) {
-      verdict = { kind: 'marginal', text: `MARGINAL — saves ~${money.format(savings)}` };
-    } else {
-      verdict = { kind: 'now', text: `NOT WORTH WAITING — current price already better (sale saves ~${money.format(savings)})` };
-    }
-
-    return { ...sale, expectedList, predictedNet, savings, verdict, learned };
-  });
-
-  return {
-    best,
-    currentBestNet,
-    threshold,
-    active: analysed.filter((sale) => sale.active),
-    upcoming: analysed.filter((sale) => !sale.active).sort((a, b) => a.start - b.start),
-    all: analysed,
+const forecastSectionHtml = (product, forecast, basisName) => {
+  const stats = forecast.stats;
+  const scenario = (key, name) => {
+    const entry = forecast.scenarios?.[key];
+    if (!entry) return '';
+    return `<tr><td><strong>${name}</strong></td><td>${money.format(entry.range[0])} – ${money.format(entry.range[1])}</td><td>${entry.note}</td></tr>`;
   };
+  const upcomingRows = forecast.upcoming.length
+    ? forecast.upcoming
+        .map(
+          (sale) => `<tr>
+            <td><strong>${sale.name}</strong></td>
+            <td>${istDate(sale.start)} → ${istDate(sale.end)}</td>
+            <td>${sale.daysAway > 0 ? `in ${sale.daysAway} days` : 'LIVE'}</td>
+            <td>${sale.dateConfidence === 'estimated' ? '<span class="est">estimated</span>' : 'confirmed'}</td>
+            <td class="source-cell">${sale.source ?? '—'}</td>
+          </tr>`
+        )
+        .join('')
+    : '';
+  return `
+  <section id="forecast-${product.id}">
+    <h2>📈 ${product.shortName} — Price Forecast</h2>
+    <div class="forecast-grid">
+      <div class="stat"><div class="stat-label">Confidence</div><div class="stat-value">${forecast.confidence}</div></div>
+      <div class="stat"><div class="stat-label">Data level</div><div class="stat-value">${forecast.label}</div></div>
+      <div class="stat"><div class="stat-label">Observations</div><div class="stat-value">${stats.count}</div></div>
+      <div class="stat"><div class="stat-label">Unique days</div><div class="stat-value">${stats.uniqueDays}</div></div>
+      <div class="stat"><div class="stat-label">Observed min</div><div class="stat-value">${stats.min ? money.format(stats.min) : 'N/A'}</div></div>
+      <div class="stat"><div class="stat-label">Observed median</div><div class="stat-value">${stats.median ? money.format(stats.median) : 'N/A'}</div></div>
+      <div class="stat"><div class="stat-label">Observed max</div><div class="stat-value">${stats.max ? money.format(stats.max) : 'N/A'}</div></div>
+      <div class="stat"><div class="stat-label">30-day volatility</div><div class="stat-value">${stats.volatility30 ? `± ${money.format(stats.volatility30)}` : 'N/A'}</div></div>
+    </div>
+    <p class="forecast-message">${forecast.message} <strong>These are scenarios, not predictions.</strong> All ranges are checkout price without exchange, based only on verified prices from <strong>${basisName}</strong> — stores that cannot deliver to your pincode are excluded.</p>
+    ${
+      forecast.scenarios
+        ? `<div class="table-wrap">
+      <table class="forecast-table">
+        <thead><tr><th>Scenario</th><th>Plausible checkout range</th><th>What it assumes</th></tr></thead>
+        <tbody>
+          ${scenario('conservative', 'Conservative')}
+          ${scenario('expected', 'Expected')}
+          ${scenario('aggressive', 'Aggressive')}
+        </tbody>
+      </table>
+      </div>
+      <p class="subtitle">Method: ${forecast.method}.${forecast.level === 1 ? ' Requires 14+ unique days before this becomes a real forecast.' : ''}</p>`
+        : ''
+    }
+    ${
+      upcomingRows
+        ? `<h3 class="sub-heading">Sale calendar</h3>
+      <div class="table-wrap">
+      <table class="forecast-table">
+        <thead><tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Date confidence</th><th>Source / note</th></tr></thead>
+        <tbody>${upcomingRows}</tbody>
+      </table>
+      </div>`
+        : ''
+    }
+  </section>`;
 };
 
-const recommendationFor = (result, analysis, product) => {
-  if (result.status !== 'ok' || !result.effectivePrice) return null;
-  const net = result.netWithExchange ?? result.effectivePrice;
-  const targetNet = result.targets?.netWithExchange;
-  if (net && targetNet && net <= targetNet) {
-    return { kind: 'buy', text: `BUY NOW — net ${money.format(net)} meets target ${money.format(targetNet)}` };
-  }
-  const upcomingWorth = analysis.upcoming.filter((sale) => sale.verdict.kind === 'worth');
-  const active = analysis.active[0];
-  if (active) {
-    return {
-      kind: 'watch',
-      text: `SALE LIVE: ${active.name} — predicted net ~${money.format(active.predictedNet)}. ${active.note}`,
-    };
-  }
-  if (upcomingWorth.length) {
-    const sale = upcomingWorth[0];
-    const when = sale.daysAway > 0 ? `in ${sale.daysAway} days` : 'soon';
-    return {
-      kind: 'wait',
-      text: `WAIT — ${sale.name} starts ${when}; predicted net ~${money.format(sale.predictedNet)} (saves ~${money.format(sale.savings)})`,
-    };
-  }
-  if (analysis.upcoming.length) {
-    const sale = analysis.upcoming[0];
-    return {
-      kind: 'buy',
-      text: `BUY NOW — upcoming ${sale.name} unlikely to beat this (predicted net ~${money.format(sale.predictedNet)} vs current ${money.format(net)})`,
-    };
-  }
-  return { kind: 'wait', text: 'No sale windows configured — buy if price drops below target' };
+const heroHtml = (product, sorted, forecast, historyEntries, config, basisName, basisSite) => {
+  const target = config.target;
+  const best = bestPurchasable(sorted);
+  const advertised = sorted
+    .filter((result) => result.status === 'ok' && result.checkoutPrice)
+    .sort((a, b) => a.checkoutPrice - b.checkoutPrice)[0] ?? null;
+  const historyLow = (() => {
+    const prices = historyForSite(historyEntries, product.id, basisSite, Number.MAX_SAFE_INTEGER).map(
+      (entry) => checkoutOf(entry)
+    );
+    return prices.length ? Math.min(...prices) : null;
+  })();
+  const stats = forecast.stats;
+  const price = best?.checkoutPrice ?? null;
+  const gap = price ? price - target.buyNow : null;
+  const progress = price ? Math.max(3, Math.min(100, Math.round((target.buyNow / price) * 100))) : 0;
+  const tier = best?.purchase?.tier ?? null;
+  const badgeClass = tier?.tier === 'BUY' ? 'badge-ok' : tier?.tier === 'STRONG_DEAL' ? 'badge-best' : 'badge-neutral';
+  const nextSale = forecast.upcoming[0] ?? null;
+  return `
+  <section class="hero">
+    <div class="hero-main">
+      <div class="hero-kicker">PRIMARY TARGET · ${product.name}</div>
+      <div class="hero-price-row">
+        <span class="hero-price">${price ? money.format(price) : '—'}</span>
+        <span class="badge ${badgeClass}">${best ? tier.label : 'NO VERIFIED PURCHASABLE OFFER'}</span>
+      </div>
+      <div class="hero-sub">
+        ${
+          price
+            ? `Lowest verified checkout at <strong>${best.name}</strong> · ${gap > 0 ? `${money.format(gap)} above your ${money.format(target.buyNow)} target` : `at or below your ${money.format(target.buyNow)} target`}`
+            : `No store currently meets all gates (in stock + deliverable to ${config.pincode} + verified identity). Advertised reference: <strong>${advertised ? `${money.format(advertised.checkoutPrice)} at ${advertised.name}` : 'none'}</strong> — not verified.`
+        }
+      </div>
+      <div class="target-block">
+        <div class="target-label"><span>Target: ${money.format(target.buyNow)}</span><span>${price ? (gap > 0 ? 'not hit yet' : '✓ hit') : 'waiting for verified offer'}</span></div>
+        <div class="target-bar"><div class="target-fill ${price && gap <= 0 ? 'hit' : ''}" style="width:${progress}%"></div></div>
+      </div>
+      <div class="hero-stats">
+        <div><span class="stat-label">History low (${basisName})</span><strong>${historyLow ? money.format(historyLow) : 'N/A'}</strong></div>
+        <div><span class="stat-label">7-day median</span><strong>${stats.median7 ? money.format(stats.median7) : 'N/A'}</strong></div>
+        <div><span class="stat-label">30-day median</span><strong>${stats.median30 ? money.format(stats.median30) : 'N/A'}</strong></div>
+        <div><span class="stat-label">Forecast</span><strong>${forecast.confidence}${forecast.scenarios ? ` · ${money.format(forecast.scenarios.expected.range[0])}–${money.format(forecast.scenarios.expected.range[1])}` : ' · illustrative only'}</strong></div>
+        <div><span class="stat-label">Next sale</span><strong>${nextSale ? `${nextSale.name} · ${nextSale.daysAway > 0 ? `in ${nextSale.daysAway} days` : 'live'}` : 'none configured'}</strong></div>
+        <div><span class="stat-label">Verified</span><strong>${best?.verifiedAt ? `${istTime(best.verifiedAt)} IST` : 'n/a'}</strong></div>
+      </div>
+      ${
+        forecast.insufficient
+          ? `<p class="hero-note">Forecast is <strong>illustrative only</strong> — ${stats.uniqueDays} days of history, ${stats.count} observations. Need 14+ days for a reliable forecast.</p>`
+          : ''
+      }
+      ${nextSale && nextSale.dateConfidence === 'estimated' ? '<p class="hero-note">Sale dates are <strong>estimated</strong>, not retailer-confirmed.</p>' : ''}
+    </div>
+  </section>`;
 };
 
 export async function writeReports({ root, config, results, historyPath }) {
@@ -297,57 +352,89 @@ export async function writeReports({ root, config, results, historyPath }) {
   const products = config.products;
   const trendIcon = { down: '▼ falling', flat: '▬ stable', up: '▲ rising' };
 
-  // Per-product analysis state
+  const hydrated = results.map((result) => {
+    const product = productOf(result, products);
+    if (!product || result.status !== 'ok') return result;
+    const identity = result.identity ?? identityCheck(result, product);
+    const base = {
+      ...result,
+      identity,
+      checkoutPrice: checkoutOf(result),
+      verifiedAt: result.verifiedAt ?? result.checkedAt,
+    };
+    return { ...base, purchase: result.purchase ?? purchaseState(base, config) };
+  });
+
+  // Per-product state: forecast comes only from verified checkout prices at the
+  // buy channel (a store that can actually deliver), never from unpurchasable stores.
   const state = products.map((product) => {
-    const productResults = results.filter((r) => r.product === product.id);
+    const productResults = hydrated.filter((result) => result.product === product.id);
     const saleState = saleCalendarState(product.saleCalendar, now);
-    const analysis = analyseSales(product, historyEntries, productResults, saleState);
     const sorted = [...productResults].sort((a, b) => {
-      const deliverableA = a.status === 'ok' && a.deliverable !== false && a.effectivePrice;
-      const deliverableB = b.status === 'ok' && b.deliverable !== false && b.effectivePrice;
-      if (deliverableA && !deliverableB) return -1;
-      if (!deliverableA && deliverableB) return 1;
-      if (!deliverableA && !deliverableB) return 0;
-      return a.effectivePrice - b.effectivePrice;
+      const aPurchasable = Boolean(a.purchase?.purchasable);
+      const bPurchasable = Boolean(b.purchase?.purchasable);
+      if (aPurchasable && !bPurchasable) return -1;
+      if (!aPurchasable && bPurchasable) return 1;
+      return (checkoutOf(a) ?? Number.POSITIVE_INFINITY) - (checkoutOf(b) ?? Number.POSITIVE_INFINITY);
     });
-    const bestDealId = sorted.find(
-      (r) => r.status === 'ok' && r.deliverable !== false && r.effectivePrice
-    )?.site;
-    return { product, results: productResults, analysis, sorted, bestDealId };
+    const best = bestPurchasable(sorted);
+    const fallbackSite = product.sites.find((site) => site.enabled) ?? product.sites[0];
+    const basisSite = best?.site ?? fallbackSite?.id ?? null;
+    const basisName =
+      productResults.find((result) => result.site === basisSite)?.name ??
+      fallbackSite?.name ??
+      basisSite ??
+      'n/a';
+    const basisHistory = historyForSite(historyEntries, product.id, basisSite, Number.MAX_SAFE_INTEGER);
+    const forecast = forecastFor(product, basisHistory, saleState, now);
+    return {
+      product,
+      results: productResults,
+      saleState,
+      forecast,
+      basisName,
+      basisSite,
+      sorted,
+      bestDealId: best?.site ?? null,
+    };
   });
 
   // Price-drop banner: biggest drop vs the previous recorded ok scrape for each site.
   const drops = [];
   for (const { product } of state) {
-    for (const r of results.filter((res) => res.product === product.id && res.status === 'ok' && res.effectivePrice)) {
+    for (const r of hydrated.filter(
+      (res) => res.product === product.id && res.status === 'ok' && checkoutOf(res)
+    )) {
       const siteHistory = historyForSite(historyEntries, product.id, r.site, 2);
       const previous = siteHistory.length >= 2 ? siteHistory[siteHistory.length - 2] : null;
-      if (previous && previous.effectivePrice > r.effectivePrice) {
+      if (previous && checkoutOf(previous) > checkoutOf(r)) {
         drops.push({
           product: product.shortName,
           site: r.name,
-          amount: previous.effectivePrice - r.effectivePrice,
-          current: r.effectivePrice,
-          was: previous.effectivePrice,
+          amount: checkoutOf(previous) - checkoutOf(r),
+          current: checkoutOf(r),
+          was: checkoutOf(previous),
         });
       }
     }
   }
   const topDrop = drops.sort((a, b) => b.amount - a.amount)[0] ?? null;
 
-  // Global banner: live sale of the primary product, else next worth-waiting sale, else top drop.
+  // Global banner: live sale, else next estimated sale, else top drop. No price promises.
   const primary = state[0];
-  const bannerHtml = primary.analysis.active.length
-    ? `<div class="banner banner-sale">🔥 SALE LIVE: ${primary.analysis.active.map((sale) => sale.name).join(', ')} — ${primary.product.shortName} predicted net ~${money.format(primary.analysis.active[0].predictedNet)}. ${primary.analysis.active[0].note}</div>`
-    : primary.analysis.upcoming.length
-      ? `<div class="banner banner-info">${primary.analysis.upcoming[0].verdict.kind === 'worth' ? '💰' : '⏳'} ${primary.analysis.upcoming[0].name} starts ${istTime(primary.analysis.upcoming[0].start.toISOString())} (${primary.analysis.upcoming[0].daysAway} days) — ${primary.product.shortName} predicted net ~${money.format(primary.analysis.upcoming[0].predictedNet)} · <strong>${primary.analysis.upcoming[0].verdict.text}</strong></div>`
+  const nextSale = primary.forecast.upcoming[0] ?? null;
+  const activeSale = primary.saleState.active[0] ?? null;
+  const bannerHtml = activeSale
+    ? `<div class="banner banner-sale">🔥 SALE LIVE: ${activeSale.name} (until ${istDate(activeSale.end)}) — buy only if a verified checkout is ≤ ${money.format(config.target.buyNow)}.</div>`
+    : nextSale
+      ? `<div class="banner banner-info">⏳ Next sale: <strong>${nextSale.name}</strong> — ${istDate(nextSale.start)} (in ${nextSale.daysAway} days, dates ${nextSale.dateConfidence}). Target stays ${money.format(config.target.buyNow)} · forecast ${primary.forecast.confidence}.</div>`
       : '';
 
   const dropBannerHtml = topDrop
     ? `<div class="banner banner-drop">🔻 Biggest recent drop: <strong>${topDrop.product} @ ${topDrop.site}</strong> ${money.format(topDrop.was)} → <strong>${money.format(topDrop.current)}</strong> (−${money.format(topDrop.amount)})</div>`
     : '';
 
-  const cardHtml = (product, r, analysis, bestDealId) => {
+  const cardHtml = (product, r, bestDealId) => {
     if (r.status === 'error') {
       const lastGood = lastKnownGood(historyEntries, product.id, r.site);
       return `
@@ -355,17 +442,19 @@ export async function writeReports({ root, config, results, historyPath }) {
             <div>
               <div class="card-header">
                 <span class="card-title">${r.name}</span>
-                <span class="badge badge-error">ERROR</span>
+                <span>
+                  <span class="badge badge-error">ERROR</span>
+                  ${lastGood && stale(lastGood.checkedAt) ? '<span class="badge badge-stale">STALE</span>' : ''}
+                </span>
               </div>
               <p style="color:var(--error); font-size:0.9rem;">${r.error}</p>
               ${
                 lastGood
                   ? `
-              <div class="price-main">${money.format(lastGood.effectivePrice)}</div>
-              <div class="price-sub">Last known good scrape: <strong>${istTime(lastGood.checkedAt)}</strong> IST</div>
-              <div class="detail-row"><span class="detail-label">List Price</span><span class="detail-value">${lastGood.listPrice ? money.format(lastGood.listPrice) : 'N/A'}</span></div>
-              <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${lastGood.maxBankOffer ? money.format(lastGood.maxBankOffer) : 'None'}</span></div>
-              <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">${lastGood.netWithExchange ? money.format(lastGood.netWithExchange) : 'N/A'}</span></div>
+              <div class="price-main">${money.format(checkoutOf(lastGood))}</div>
+              <div class="price-sub">Last known good scrape: <strong>${istTime(lastGood.checkedAt)}</strong> IST — <strong>not current</strong></div>
+              <div class="detail-row"><span class="detail-label">M.R.P.</span><span class="detail-value">${lastGood.mrp ? money.format(lastGood.mrp) : 'N/A'}</span></div>
+              <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${lastGood.maxBankOffer ? `${money.format(lastGood.maxBankOffer)} (unverified)` : 'None'}</span></div>
               <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">${lastGood.delivery ?? 'N/A'}</span></div>`
                   : '<p style="color:var(--muted); font-size:0.9rem;">No successful scrape recorded yet.</p>'
               }
@@ -376,103 +465,103 @@ export async function writeReports({ root, config, results, historyPath }) {
 
     const entries = historyForSite(historyEntries, product.id, r.site);
     const trend = trendOf(entries);
+    const price = r.checkoutPrice ?? checkoutOf(r);
+    const purchase = r.purchase ?? {
+      purchasable: false,
+      blockers: ['PRICE_UNVERIFIED'],
+      tier: { tier: 'UNKNOWN', label: 'UNKNOWN' },
+    };
+    const rec = statusFor(r, config);
+    const target = config.target;
     const lowestRecorded = entries.length
-      ? entries.reduce((min, entry) => (entry.effectivePrice < min.effectivePrice ? entry : min))
+      ? entries.reduce((min, entry) => (checkoutOf(entry) < checkoutOf(min) ? entry : min))
       : null;
-    const rec = recommendationFor(r, analysis, product);
-    const deliverable = r.deliverable !== false;
-    const targetNet = r.targets?.netWithExchange ?? null;
-    const netNow = r.netWithExchange ?? r.effectivePrice;
-    const targetReached = Boolean(targetNet && netNow && netNow <= targetNet);
-    const targetGap = targetNet && netNow ? netNow - targetNet : null;
-    const targetPct = targetNet && netNow ? Math.max(4, Math.min(100, Math.round((targetNet / netNow) * 100))) : null;
+    const gap = price ? price - target.buyNow : null;
+    const targetPct = price ? Math.max(4, Math.min(100, Math.round((target.buyNow / price) * 100))) : 0;
+    const isStale = stale(r.verifiedAt);
+    const tierBadge =
+      purchase.tier.tier === 'BUY' ? 'badge-ok' : purchase.tier.tier === 'STRONG_DEAL' ? 'badge-best' : 'badge-neutral';
+    const bestBank = r.bankOffers?.[0] ?? null;
+    const identity = r.identity;
 
     return `
         <div class="card ${r.site === bestDealId ? 'card-best' : ''}">
           <div>
             <div class="card-header">
               <span class="card-title">${r.name}</span>
-              <span>
-                ${r.site === bestDealId ? '<span class="badge badge-best">★ BEST DEAL</span>' : ''}
-                <span class="badge ${deliverable ? 'badge-ok' : 'badge-error'}">${deliverable ? 'BUYABLE' : 'NOT DELIVERABLE'}</span>
+              <span class="badge-row">
+                ${r.site === bestDealId ? '<span class="badge badge-best">★ BEST VERIFIED</span>' : ''}
+                <span class="badge ${tierBadge}">${purchase.tier.label}</span>
+                <span class="badge ${purchase.purchasable ? 'badge-ok' : 'badge-error'}">${purchase.purchasable ? 'PURCHASABLE' : 'NOT PURCHASABLE'}</span>
+                ${isStale ? '<span class="badge badge-stale">STALE</span>' : ''}
               </span>
             </div>
-            <div class="price-main">${money.format(r.effectivePrice)}</div>
-            <div class="price-sub">List: ${money.format(r.listPrice)} | Trend: ${trendIcon[trend]}${
-              lowestRecorded && lowestRecorded.effectivePrice < r.effectivePrice
-                ? ` | Lowest recorded: <span class="low-record">${money.format(lowestRecorded.effectivePrice)}</span> on ${istTime(lowestRecorded.checkedAt)}`
-                : ''
-            }</div>
+            <div class="price-main">${price ? money.format(price) : '—'}</div>
+            <div class="price-sub">
+              Selling price${r.mrp ? ` · M.R.P. ${money.format(r.mrp)}` : ''} · excludes bank/exchange | Trend: ${trendIcon[trend]}${
+                lowestRecorded && checkoutOf(lowestRecorded) < price
+                  ? ` | Lowest recorded: <span class="low-record">${money.format(checkoutOf(lowestRecorded))}</span> on ${istTime(lowestRecorded.checkedAt)}`
+                  : ''
+              }
+            </div>
             ${chart(entries, `${product.id}-${r.site}`)}
-            ${rec ? `<div class="rec rec-${rec.kind}">${rec.kind === 'buy' ? '🟢' : rec.kind === 'watch' ? '🟡' : '🔵'} ${rec.text}</div>` : ''}
+            ${rec ? `<div class="rec rec-${rec.kind}">${rec.kind === 'buy' ? '🟢' : rec.kind === 'watch' ? '🟡' : rec.kind === 'blocked' ? '🔴' : '🔵'} ${rec.text}</div>` : ''}
             ${
-              targetNet
+              price
                 ? `
             <div class="target-block">
-              <div class="target-label"><span>Your target: ${money.format(targetNet)}</span><span>${targetReached ? '✓ hit' : `${money.format(targetGap)} away`}</span></div>
-              <div class="target-bar"><div class="target-fill ${targetReached ? 'hit' : ''}" style="width:${targetPct}%"></div></div>
+              <div class="target-label"><span>Your target: ${money.format(target.buyNow)} (no exchange)</span><span>${gap > 0 ? `${money.format(gap)} away` : '✓ hit'}</span></div>
+              <div class="target-bar"><div class="target-fill ${gap <= 0 ? 'hit' : ''}" style="width:${targetPct}%"></div></div>
             </div>`
                 : ''
             }
-            <div class="detail-row"><span class="detail-label">Net w/ Exchange</span><span class="detail-value" style="color:var(--success); font-weight:700;">${r.netWithExchange ? money.format(r.netWithExchange) : 'N/A'}</span></div>
-            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${r.maxBankOffer ? money.format(r.maxBankOffer) : 'None'}</span></div>
-            <div class="detail-row"><span class="detail-label">Exchange Ceiling</span><span class="detail-value">${r.exchangeCeiling ? money.format(r.exchangeCeiling) : 'N/A'}</span></div>
+            <div class="detail-row"><span class="detail-label">M.R.P.</span><span class="detail-value">${r.mrp ? money.format(r.mrp) : 'N/A'}</span></div>
+            <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${r.maxBankOffer ? `${money.format(r.maxBankOffer)}${bestBank ? ` (${bestBank.bank})` : ''} — eligibility unverified` : 'None'}</span></div>
+            <div class="detail-row"><span class="detail-label">Exchange (optional)</span><span class="detail-value">${
+              r.assumedExchangeValue && r.exchangeAdjustedPrice
+                ? `assumed ${money.format(r.assumedExchangeValue)} → ${money.format(r.exchangeAdjustedPrice)} after exchange${r.exchangeCeiling ? ` (ceiling ${money.format(r.exchangeCeiling)})` : ''} — not a discount`
+                : 'N/A'
+            }</span></div>
             <div class="detail-row"><span class="detail-label">Seller</span><span class="detail-value">${r.seller ?? 'N/A'}</span></div>
-            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">${r.delivery ?? 'N/A'}</span></div>
+            <div class="detail-row"><span class="detail-label">Delivery</span><span class="detail-value">${r.delivery ?? 'N/A'}${r.deliveryNote ? ` (${r.deliveryNote})` : ''}</span></div>
             <div class="detail-row"><span class="detail-label">COD</span><span class="detail-value">${r.cod === true ? 'Yes' : r.cod === false ? 'No' : 'N/A'}</span></div>
+            <div class="detail-row"><span class="detail-label">Identity</span><span class="detail-value">${
+              identity
+                ? `${identity.storageMatch === false ? '❌ storage' : identity.storageMatch ? '✓ 256GB' : 'storage n/a'} · ${identity.colorMatch === false ? '❌ colour' : identity.colorMatch ? '✓ colour' : 'colour n/a'}`
+                : 'unverified'
+            }</span></div>
+            <div class="detail-row"><span class="detail-label">Verified</span><span class="detail-value">${r.verifiedAt ? `${istTime(r.verifiedAt)} IST` : 'N/A'}${isStale ? ' — stale' : ''}</span></div>
           </div>
           <a href="${r.url}" target="_blank" class="btn">View Product</a>
         </div>`;
   };
 
-  const analyserSectionHtml = (product, analysis) => `
-    <section>
-      <h2>🛒 ${product.shortName} — Sale Analyser</h2>
-      <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Sale</th><th>Window (IST)</th><th>Status</th><th>Drop Est.</th><th>Expected List</th><th>Predicted Net</th><th>Verdict</th></tr>
-        </thead>
-        <tbody>
-          ${analysis.all
-            .map((sale) => {
-              const active = sale.active;
-              const daysAway = sale.daysAway;
-              const learned = sale.learned?.observedDropPct != null;
-              const dropCell = learned
-                ? `<span class="learned" title="Calibrated from ${sale.learned.samples} scrapes during the sale window (baseline list ₹${sale.learned.baseline?.toLocaleString('en-IN')})">📈 ${pctStr(sale.learned.observedDropPct)} learned</span>`
-                : sale.historicalDropPct
-                  ? `${pctStr(sale.historicalDropPct)} <span class="est">(estimate)</span>`
-                  : '<span class="est">—</span>';
-              const verdictColor = { worth: 'var(--success)', marginal: 'var(--warning)', now: 'var(--success)', live: 'var(--warning)', unknown: 'var(--muted)' }[sale.verdict.kind] ?? 'var(--text)';
-              return `
-            <tr>
-              <td><strong>${sale.name}</strong></td>
-              <td>${istDate(sale.start)} → ${istDate(sale.end)}</td>
-              <td class="${active ? 'sale-active' : ''}">${active ? '🔥 LIVE' : daysAway > 0 ? `in ${daysAway} days` : 'passed'}</td>
-              <td>${dropCell}</td>
-              <td>${money.format(sale.expectedList)}</td>
-              <td><strong>~${money.format(sale.predictedNet)}</strong></td>
-              <td style="color:${verdictColor}; font-weight:600;">${sale.verdict.text}</td>
-            </tr>`;
-            })
-            .join('')}
-        </tbody>
-      </table>
-      </div>
-      <p class="subtitle" style="margin-top:0.75rem;">Expected list = min(configured estimate, drop% applied to lowest recorded list, price actually observed once the sale starts). Drop % starts as a configured guess and <strong>self-calibrates</strong> from real sale-window scrapes.${product.assumedExchangeValue ? ` Net assumes ₹${money.format(product.assumedExchangeValue)} exchange.` : ' No exchange assumed for this product.'}</p>
-    </section>`;
-
   const productSectionHtml = state
-    .map(({ product, sorted, analysis, bestDealId }) => `
+    .map(({ product, sorted, forecast, bestDealId, basisName }) => `
     <div class="product-block" data-product="${product.id}">
     <h2 class="product-heading">📱 ${product.name}${product.id === 'iphone17' ? ' <span class="primary-tag">your target</span>' : ' <span class="watch-tag">watching</span>'}</h2>
     <div class="grid">
-      ${sorted.map((r) => cardHtml(product, r, analysis, bestDealId)).join('')}
+      ${sorted.map((r) => cardHtml(product, r, bestDealId)).join('')}
     </div>
-    ${analyserSectionHtml(product, analysis)}
+    ${forecastSectionHtml(product, forecast, basisName)}
     </div>`)
     .join('\n');
+
+  const previousEntryFor = (entry) => {
+    let index = historyEntries.indexOf(entry);
+    for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
+      const candidate = historyEntries[cursor];
+      if (
+        (candidate.product ?? 'iphone17') === (entry.product ?? 'iphone17') &&
+        candidate.site === entry.site &&
+        candidate.status === 'ok' &&
+        checkoutOf(candidate)
+      ) {
+        return candidate;
+      }
+    }
+    return null;
+  };
 
   const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -480,7 +569,7 @@ export async function writeReports({ root, config, results, historyPath }) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="refresh" content="300">
-  <title>Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26</title>
+  <title>Price Monitor — iPhone 17 target ₹70,000</title>
   <style>
     :root {
       --text: #f1f5f9; --muted: #9aa8bd;
@@ -679,6 +768,33 @@ export async function writeReports({ root, config, results, historyPath }) {
     .learned { color: var(--success); font-weight: 600; }
     .est { color: var(--muted); font-size: 0.85em; }
     .low-record { color: var(--success); font-weight: 600; }
+    .badge-neutral { background: rgba(148, 163, 184, 0.14); color: var(--muted); border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-stale { background: rgba(251, 146, 60, 0.14); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.35); }
+    .badge-row { display: inline-flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end; }
+    .rec-blocked { background: rgba(248, 113, 113, 0.10); border: 1px solid rgba(248, 113, 113, 0.35); color: var(--error); }
+    .hero {
+      background: linear-gradient(150deg, rgba(125, 211, 252, 0.16), rgba(168, 85, 247, 0.10) 55%, var(--glass));
+      border: 1px solid rgba(125, 211, 252, 0.35); border-radius: 1.5rem; padding: 1.75rem 2rem; margin-bottom: 1.5rem;
+      backdrop-filter: blur(22px) saturate(170%); -webkit-backdrop-filter: blur(22px) saturate(170%);
+      box-shadow: 0 14px 44px rgba(2, 6, 23, 0.5), inset 0 1px 0 rgba(255,255,255,0.22);
+    }
+    .hero-kicker { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.6rem; }
+    .hero-price-row { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+    .hero-price { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; text-shadow: 0 0 30px rgba(125, 211, 252, 0.35); }
+    .hero-sub { color: var(--muted); margin: 0.55rem 0 0; font-size: 0.95rem; }
+    .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+    .hero-stats > div { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 0.8rem; padding: 0.6rem 0.75rem; }
+    .hero-stats .stat-label { display: block; margin-bottom: 0.2rem; }
+    .hero-stats strong { font-size: 0.92rem; font-weight: 600; }
+    .hero-note { margin-top: 0.8rem; font-size: 0.85rem; color: var(--warning); }
+    .forecast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.7rem; margin-bottom: 0.9rem; }
+    .stat { background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.65rem 0.75rem; }
+    .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 0.95rem; font-weight: 600; margin-top: 0.15rem; }
+    .forecast-message { margin: 0.35rem 0 0.9rem; font-size: 0.9rem; color: var(--muted); }
+    .forecast-table td { vertical-align: top; }
+    .source-cell { color: var(--muted); font-size: 0.82rem; max-width: 280px; }
+    .sub-heading { margin: 1.25rem 0 0.6rem; font-size: 1rem; }
     @media (max-width: 640px) {
       body { padding: 1rem; }
       header { flex-direction: column; align-items: flex-start; gap: 0.4rem; padding: 1rem 1.15rem; }
@@ -697,6 +813,10 @@ export async function writeReports({ root, config, results, historyPath }) {
       table { font-size: 0.8rem; }
       th, td { padding: 0.55rem 0.5rem; }
       .rec { font-size: 0.82rem; }
+      .hero { padding: 1.25rem; }
+      .hero-price { font-size: 2.1rem; }
+      .hero-sub { font-size: 0.88rem; }
+      .badge-row { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -704,7 +824,7 @@ export async function writeReports({ root, config, results, historyPath }) {
   <header>
     <div>
       <h1>📱 Price Monitor — iPhone 17 · Galaxy S25 · S26</h1>
-      <div class="subtitle">Pincode: <strong>${config.pincode}</strong> | iPhone net assumes M35 exchange <strong>${money.format(products[0].assumedExchangeValue)}</strong> | Cards sorted by lowest price you can actually buy at</div>
+      <div class="subtitle">Target: <strong>iPhone 17 256GB Mist Blue ≤ ${money.format(config.target.buyNow)}</strong> checkout, no exchange | Pincode: <strong>${config.pincode}</strong></div>
     </div>
     <div class="header-right">
       <div class="filter-row">
@@ -718,6 +838,7 @@ export async function writeReports({ root, config, results, historyPath }) {
     </div>
   </header>
 
+  ${heroHtml(primary.product, primary.sorted, primary.forecast, historyEntries, config, primary.basisName, primary.basisSite)}
   ${bannerHtml}
   ${dropBannerHtml}
   ${productSectionHtml}
@@ -727,24 +848,26 @@ export async function writeReports({ root, config, results, historyPath }) {
     <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>Time (IST)</th><th>Product</th><th>Site</th><th>Status</th><th>List</th><th>Effective</th><th>Net w/ Exchange</th></tr>
+        <tr><th>Time (IST)</th><th>Product</th><th>Site</th><th>Status</th><th>Checkout</th><th>Δ prev</th><th>M.R.P.</th></tr>
       </thead>
       <tbody>
         ${historyEntries
           .slice(-20)
           .reverse()
-          .map(
-            (entry) => `
+          .map((entry) => {
+            const previous = entry.status === 'ok' ? previousEntryFor(entry) : null;
+            const delta = previous && checkoutOf(entry) ? checkoutOf(entry) - checkoutOf(previous) : null;
+            return `
           <tr>
             <td>${istTime(entry.checkedAt)}</td>
             <td>${productOf(entry, products)?.shortName ?? entry.product ?? 'iPhone 17'}</td>
             <td><strong>${entry.name}</strong></td>
             <td><span class="badge ${entry.status === 'ok' ? 'badge-ok' : 'badge-error'}">${entry.status}</span></td>
-            <td>${entry.listPrice ? money.format(entry.listPrice) : '-'}</td>
-            <td>${entry.effectivePrice ? money.format(entry.effectivePrice) : '-'}</td>
-            <td>${entry.netWithExchange ? money.format(entry.netWithExchange) : '-'}</td>
-          </tr>`
-          )
+            <td>${checkoutOf(entry) ? money.format(checkoutOf(entry)) : '-'}</td>
+            <td style="color:${delta < 0 ? 'var(--success)' : delta > 0 ? 'var(--error)' : 'var(--muted)'};">${delta === null ? '-' : `${delta > 0 ? '+' : ''}${money.format(delta)}`}</td>
+            <td>${entry.mrp ? money.format(entry.mrp) : '-'}</td>
+          </tr>`;
+          })
           .join('')}
       </tbody>
     </table>
@@ -772,10 +895,10 @@ export async function writeReports({ root, config, results, historyPath }) {
           block.classList.toggle('hidden', value !== 'all' && block.getAttribute('data-product') !== value);
         });
       };
-      let saved = 'all';
-      try { saved = localStorage.getItem('priceFilter') || 'all'; } catch (e) {}
+      let saved = 'iphone17';
+      try { saved = localStorage.getItem('priceFilter') || 'iphone17'; } catch (e) {}
       if (filterEl) {
-        if (![...filterEl.options].some(function (o) { return o.value === saved; })) saved = 'all';
+        if (![...filterEl.options].some(function (o) { return o.value === saved; })) saved = 'iphone17';
         filterEl.value = saved;
         applyFilter(saved);
         filterEl.addEventListener('change', function () {
@@ -841,52 +964,62 @@ export async function writeReports({ root, config, results, historyPath }) {
   // 3. Markdown report — per product
   const mdLines = [
     `# 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26`,
-    `**Target Pincode:** \`${config.pincode}\` | **Updated:** ${istTime(now)} IST`,
+    `**Primary target:** iPhone 17 256GB Mist Blue ≤ ${money.format(config.target.buyNow)} checkout (no exchange) | **Pincode:** \`${config.pincode}\` | **Updated:** ${istTime(now)} IST`,
   ];
 
-  for (const { product, sorted, analysis } of state) {
+  for (const { product, sorted, forecast, bestDealId, basisName } of state) {
     mdLines.push(
       ``,
       `## ${product.name}`,
       ``,
-      `| Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net${product.assumedExchangeValue ? ` (w/ ₹${product.assumedExchangeValue} exchange)` : ''} | Delivery |`,
+      `| Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |`,
       `| --- | --- | --- | --- | --- | --- | --- | --- |`,
     );
-    sorted.forEach((r, index) => {
+    sorted.forEach((r) => {
       if (r.status === 'error') {
-        mdLines.push(`| ${index + 1} | **${r.name}** | - | ❌ Error (last good: see dashboard) | - | - | - | - |`);
+        mdLines.push(`| [**${r.name}**](${r.url}) | — | ❌ Error | last known: see dashboard | — | — | — | — |`);
       } else {
-        const bestBankStr = r.maxBankOffer ? `${money.format(r.maxBankOffer)} (${r.bankOffers?.[0]?.bank ?? ''})` : 'None';
-        const netStr = r.netWithExchange ? money.format(r.netWithExchange) : 'N/A';
-        const deliverableStr = r.deliverable === false ? '❌ No' : '✅ Yes';
+        const purchase = r.purchase ?? {};
+        const exchange =
+          r.assumedExchangeValue && r.exchangeAdjustedPrice
+            ? `${money.format(r.assumedExchangeValue)} assumed → ${money.format(r.exchangeAdjustedPrice)}`
+            : '—';
+        const checkout = checkoutOf(r);
         mdLines.push(
-          `| ${index + 1} | [**${r.name}**](${r.url}) | ${deliverableStr} | **${money.format(r.effectivePrice)}** | ${money.format(r.listPrice)} | ${bestBankStr} | **${netStr}** | ${r.delivery ?? 'N/A'} |`
+          `| [**${r.name}**](${r.url}) | ${purchase.tier?.label ?? 'UNKNOWN'}${r.site === bestDealId ? ' ★' : ''} | ${purchase.purchasable ? '✅ Yes' : `❌ ${blockersText(r)}`} | **${checkout ? money.format(checkout) : '—'}** | ${r.mrp ? money.format(r.mrp) : '—'} | ${r.maxBankOffer ? money.format(r.maxBankOffer) : '—'} | ${exchange} | ${r.verifiedAt ? istTime(r.verifiedAt) : istTime(r.checkedAt)} |`
         );
       }
     });
 
     mdLines.push(
       ``,
-      `### 🛒 Sales Analyser`,
-      `- Current best buyable: ${analysis.best ? `${analysis.best.name} net ${money.format(analysis.currentBestNet)}` : 'none yet'}`,
+      `### 📈 Forecast`,
+      `- Level: **${forecast.label}** · Confidence: **${forecast.confidence}** · Observations: ${forecast.stats.count} over ${forecast.stats.uniqueDays} unique days`,
+      `- Basis: verified **${basisName}** checkout prices only (stores that cannot deliver are excluded)`,
+      `- ${forecast.message}`
     );
-    const dropNote = (sale) => {
-      const pct = sale.learned?.observedDropPct ?? sale.historicalDropPct;
-      return sale.learned?.observedDropPct != null
-        ? `**learned ${pctStr(pct)} from ${sale.learned.samples} scrapes**`
-        : pct ? `${pctStr(pct)} (estimate, self-calibrates when the sale starts)` : 'unknown';
-    };
-    if (analysis.active.length) {
-      for (const sale of analysis.active) {
-        mdLines.push(`- 🔥 **SALE LIVE: ${sale.name}** (until ${istTime(sale.end.toISOString())}) — expected list ~${money.format(sale.expectedList)}, predicted net ~${money.format(sale.predictedNet)}. ${sale.note}`);
+    if (forecast.scenarios) {
+      for (const [key, name] of [
+        ['conservative', 'Conservative'],
+        ['expected', 'Expected'],
+        ['aggressive', 'Aggressive'],
+      ]) {
+        const scenario = forecast.scenarios[key];
+        mdLines.push(`- **${name}:** ${money.format(scenario.range[0])} – ${money.format(scenario.range[1])} (${scenario.note})`);
       }
-    } else if (analysis.upcoming.length) {
-      for (const sale of analysis.upcoming) {
-        mdLines.push(`- ${sale.verdict.kind === 'worth' ? '💰' : sale.verdict.kind === 'marginal' ? '🤔' : '✅'} **${sale.name}** (${sale.daysAway} days): expected list ~${money.format(sale.expectedList)} · drop ${dropNote(sale)} · predicted net ~${money.format(sale.predictedNet)} — **${sale.verdict.text}**`);
+      mdLines.push(`- Method: ${forecast.method}`);
+    }
+    if (forecast.upcoming.length) {
+      mdLines.push(`- Upcoming sales (dates estimated, not retailer-confirmed):`);
+      for (const sale of forecast.upcoming) {
+        mdLines.push(
+          `  - **${sale.name}**: ${istDate(sale.start)} → ${istDate(sale.end)} (${sale.daysAway > 0 ? `${sale.daysAway} days` : 'live'}) — ${sale.source ?? 'no source'}`
+        );
       }
     } else {
-      mdLines.push(`- No sale windows configured`);
+      mdLines.push(`- No upcoming sale windows configured`);
     }
+    mdLines.push(`- All ranges are checkout price without exchange or unverified bank offers.`);
   }
 
   const mdContent = mdLines.join('\n');
