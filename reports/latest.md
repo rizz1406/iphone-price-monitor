@@ -1,5 +1,5 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Target Pincode:** `500055` | **Updated:** 19 Nov 2026, 5:09 pm IST
+**Target Pincode:** `500055` | **Updated:** 19 Nov 2026, 5:40 pm IST
 
 ## iPhone 17 256GB Mist Blue
 
@@ -21,7 +21,7 @@
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | ✅ Yes | **₹83,999** | ₹87,999 | ₹4,000 (Flipkart Axis) | **₹83,999** | Tuesday, 24 Nov |
-| 2 | [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | ✅ Yes | **₹87,999** | ₹87,999 | None | **₹87,999** | Tuesday, 24 N |
+| 2 | [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | ✅ Yes | **₹87,999** | ₹87,999 | None | **₹87,999** | Monday, 23 N |
 
 ### 🛒 Sales Analyser
 - Current best buyable: Flipkart net ₹83,999
@@ -33,7 +33,7 @@
 
 | Rank | Site | Deliverable | Effective | List Price | Best Bank Offer | Net | Delivery |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹69,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹69,349** | Tomorrow, 11 PM |
+| 1 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | ✅ Yes | **₹69,349** | ₹72,999 | ₹3,650 (Flipkart Axis) | **₹69,349** | Saturday, 21 Nov |
 
 ### 🛒 Sales Analyser
 - Current best buyable: Flipkart net ₹69,349
