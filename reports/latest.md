@@ -1,17 +1,17 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 1:45 am IST
+**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 2:15 am IST
 
 ## iPhone 17 256GB Mist Blue
 
 | Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | WAIT ★ | ✅ Yes | **₹89,100** | — | ₹4,000 | — | 20 Nov 2026, 1:41 am |
-| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ✅ Yes | **₹93,990** | — | ₹10,000 | — | 20 Nov 2026, 1:42 am |
-| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ colour unverified | **₹94,490** | — | — | — | 20 Nov 2026, 1:42 am |
+| [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | WAIT ★ | ✅ Yes | **₹89,100** | — | ₹4,000 | ₹5,000 assumed → ₹84,100 | 20 Nov 2026, 2:13 am |
+| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ❌ delivery unverified | **₹93,990** | — | ₹10,000 | ₹5,000 assumed → ₹88,990 | 20 Nov 2026, 2:13 am |
+| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ delivery unverified, colour unverified | **₹94,490** | ₹99,900 | — | — | 20 Nov 2026, 2:14 am |
 | [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | — | ❌ Error | last known: see dashboard | — | — | — | — |
 
 ### 📈 Forecast
-- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 108 over 6 unique days
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 109 over 6 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 6 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
 - **Conservative:** ₹89,100 – ₹95,000 (price holds near its recent level)
@@ -29,11 +29,11 @@
 
 | Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | WAIT ★ | ✅ Yes | **₹87,999** | — | ₹4,000 | — | 20 Nov 2026, 1:42 am |
-| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT | ✅ Yes | **₹87,999** | — | — | — | 20 Nov 2026, 1:43 am |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | WAIT | ❌ not deliverable to pincode | **₹87,999** | — | ₹4,000 | — | 20 Nov 2026, 2:14 am |
+| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT | ❌ delivery unverified | **₹87,999** | ₹1,17,999 | — | — | 20 Nov 2026, 2:14 am |
 
 ### 📈 Forecast
-- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 91 over 4 unique days
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 92 over 4 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
 - **Conservative:** ₹88,000 – ₹88,000 (price holds near its recent level)
@@ -49,10 +49,10 @@
 
 | Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | STRONG DEAL ★ | ✅ Yes | **₹72,999** | — | ₹3,650 | — | 20 Nov 2026, 1:43 am |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | STRONG DEAL | ❌ delivery unverified | **₹72,999** | — | ₹3,650 | — | 20 Nov 2026, 2:15 am |
 
 ### 📈 Forecast
-- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 91 over 4 unique days
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 92 over 4 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
 - **Conservative:** ₹73,000 – ₹73,000 (price holds near its recent level)
