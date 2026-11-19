@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-19T18:38:28.885Z",
+  "updatedAt": "2026-11-19T19:10:03.660Z",
   "pincode": "500055",
   "sites": [
     {
@@ -7,10 +7,50 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Flipkart",
-      "checkedAt": "2026-11-19T18:35:19.276Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
+      "checkedAt": "2026-11-19T19:08:22.471Z",
+      "status": "ok",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
+      "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
+      "listPrice": 89100,
+      "effectivePrice": 85100,
+      "maxBankOffer": 4000,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000
+        },
+        {
+          "bank": "ICICI",
+          "amount": 1101
+        },
+        {
+          "bank": "HDFC",
+          "amount": 891
+        },
+        {
+          "bank": "SBI",
+          "amount": 891
+        },
+        {
+          "bank": "Axis",
+          "amount": 891
+        }
+      ],
+      "bankOfferKind": "instant",
+      "exchangeCeiling": 65750,
+      "exchangeAvailable": true,
+      "assumedExchangeValue": 5000,
+      "netWithExchange": 80100,
+      "seller": "Vision Star",
+      "delivery": "Sunday, 22 Nov",
+      "inStock": true,
+      "deliverable": true,
+      "cod": false,
+      "pincodeSet": true,
       "targets": {
         "listPrice": 84999,
         "effectivePrice": 80000,
@@ -22,7 +62,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Croma",
-      "checkedAt": "2026-11-19T18:35:31.266Z",
+      "checkedAt": "2026-11-19T19:08:35.342Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -52,7 +92,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-19T18:35:43.488Z",
+      "checkedAt": "2026-11-19T19:08:47.011Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
@@ -98,7 +138,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Amazon",
-      "checkedAt": "2026-11-19T18:36:04.921Z",
+      "checkedAt": "2026-11-19T19:09:08.103Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0FQFYXCC4",
       "title": "Apple iPhone 17 256 GB: 15.93 cm (6.3″) Display with Promotion, A19 Chip, Center Stage Front Camera for Smarter Group Selfies, Improved Scratch Resistance, All-Day Battery Life; Black",
@@ -128,10 +168,34 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-19T18:37:11.253Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
+      "checkedAt": "2026-11-19T19:09:24.830Z",
+      "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
+      "title": "Samsung Galaxy S26 5G (White, 256 GB) (12 GB RAM)",
+      "listPrice": 87999,
+      "effectivePrice": 83999,
+      "maxBankOffer": 4000,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000
+        }
+      ],
+      "bankOfferKind": "instant",
+      "exchangeCeiling": 65750,
+      "exchangeAvailable": false,
+      "assumedExchangeValue": 0,
+      "netWithExchange": 83999,
+      "seller": "BTPLD",
+      "delivery": null,
+      "inStock": true,
+      "deliverable": false,
+      "cod": false,
+      "pincodeSet": true,
       "targets": {
         "listPrice": 85999,
         "effectivePrice": 83999,
@@ -143,7 +207,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Amazon",
-      "checkedAt": "2026-11-19T18:37:22.409Z",
+      "checkedAt": "2026-11-19T19:09:36.608Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0GL87VP7N",
       "title": "Samsung Galaxy S26 5G (Cobalt Violet, 12GB RAM, 256GB Storage), AI Phone, Photo Assist, Creative Studio, 50MP Camera with ProVisual Engine, Powerful Customized Processor and 4300mAh Battery",
@@ -157,7 +221,7 @@
       "assumedExchangeValue": 0,
       "netWithExchange": 87999,
       "seller": "Clicktech Retail Private Ltd",
-      "delivery": "Sunday, 22 N",
+      "delivery": "Tuesday, 24 N",
       "inStock": true,
       "deliverable": true,
       "cod": null,
@@ -173,10 +237,34 @@
       "product": "galaxy-s25",
       "productName": "Galaxy S25 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-19T18:38:28.821Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
+      "checkedAt": "2026-11-19T19:10:02.864Z",
+      "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537",
+      "title": "Samsung Galaxy S25 5G Snapdragon (Navy, 256 GB) (12 GB RAM)",
+      "listPrice": 72999,
+      "effectivePrice": 58349,
+      "maxBankOffer": 3650,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 3650
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 3650
+        }
+      ],
+      "bankOfferKind": "instant",
+      "exchangeCeiling": 57200,
+      "exchangeAvailable": true,
+      "assumedExchangeValue": 0,
+      "netWithExchange": 58349,
+      "seller": "Truenet Commerce",
+      "delivery": "Tomorrow, 11 PM",
+      "inStock": true,
+      "deliverable": true,
+      "cod": false,
+      "pincodeSet": false,
       "targets": {
         "listPrice": 59999,
         "effectivePrice": 58999,
