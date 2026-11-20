@@ -11,6 +11,7 @@ import {
   purchaseState,
   quantile,
   roundMoney,
+  targetFor,
 } from '../src/pricing.js';
 
 const config = {
@@ -33,6 +34,7 @@ const okResult = (overrides = {}) => ({
   listPrice: 70000,
   inStock: true,
   deliverable: true,
+  purchase: { purchasable: true },
   identity: identityCheck({ title: 'Apple iPhone 17 (Mist Blue, 256 GB)' }, product),
   ...overrides,
 });
@@ -47,6 +49,15 @@ test('priceTier boundaries match the purchase spec exactly', () => {
   assert.equal(priceTier(80000).tier, 'WAIT');
   assert.equal(priceTier(85000).tier, 'WAIT');
   assert.equal(priceTier(null).tier, 'UNKNOWN');
+});
+
+test('targetFor uses a product-specific target before the global fallback', () => {
+  const scoped = {
+    target: { buyNow: 70000, strongDealMax: 74999, watchMax: 79999 },
+    products: [{ id: 'iphone17', target: { buyNow: 79900, strongDealMax: 82900, watchMax: 87900 } }],
+  };
+  assert.equal(targetFor(scoped, 'iphone17').buyNow, 79900);
+  assert.equal(targetFor(scoped, 'unknown').buyNow, 70000);
 });
 
 test('checkoutOf prefers checkoutPrice and ignores bank/exchange deductions', () => {
@@ -147,6 +158,7 @@ test('forecastFor is honest with only 6 days of data', () => {
     checkedAt: new Date(Date.UTC(2026, 10, 13 + Math.floor(index / 5), 10, 0, 0)).toISOString(),
     checkoutPrice: 85000 + (index % 3) * 500,
     effectivePrice: 85000 + (index % 3) * 500,
+    purchase: { purchasable: true },
   }));
   const forecast = forecastFor(product, history, { upcoming: [], all: [] }, '2026-11-18T12:00:00.000Z');
   assert.equal(forecast.level, 1);
@@ -164,6 +176,7 @@ test('forecastFor escalates once 14+ days exist', () => {
     checkedAt: new Date(Date.UTC(2026, 9, 1 + Math.floor(index / 2), 10, 0, 0)).toISOString(),
     checkoutPrice: 82000 + (index % 5) * 400,
     effectivePrice: 82000 + (index % 5) * 400,
+    purchase: { purchasable: true },
   }));
   const forecast = forecastFor(product, history, { upcoming: [], all: [] }, '2026-11-30T12:00:00.000Z');
   assert.equal(forecast.level, 2);
@@ -198,6 +211,37 @@ test('evaluateAlerts fires BUY_NOW only when purchasable and ≤ 70000', () => {
     now: '2026-11-20T10:00:00.000Z',
   });
   assert.equal(blocked.alerts.some((alert) => alert.kind === 'BUY_NOW'), false);
+});
+
+test('evaluateAlerts does not say BUY NOW before the configured purchase month', () => {
+  const result = evaluateAlerts({
+    result: okResult({ checkoutPrice: 69000, effectivePrice: 69000 }),
+    previous: okResult({ checkoutPrice: 86000, effectivePrice: 86000 }),
+    history: [],
+    config: { ...config, purchasePlan: { notBefore: '2026-12-01' } },
+    state: {},
+    now: '2026-11-20T10:00:00.000Z',
+  });
+  assert.equal(result.alerts.some((alert) => alert.kind === 'BUY_NOW'), false);
+});
+
+test('confirmationChecks requires two matching verified observations', () => {
+  const confirmedConfig = {
+    ...config,
+    alerts: { ...config.alerts, confirmationChecks: 2, confirmationTolerance: 200 },
+  };
+  const current = okResult({ checkoutPrice: 70000, effectivePrice: 70000 });
+  const first = evaluateAlerts({ result: current, previous: null, history: [], config: confirmedConfig, state: {} });
+  assert.equal(first.alerts.length, 0);
+
+  const second = evaluateAlerts({
+    result: current,
+    previous: current,
+    history: [okResult({ checkoutPrice: 70100, effectivePrice: 70100 })],
+    config: confirmedConfig,
+    state: {},
+  });
+  assert.equal(second.alerts.some((alert) => alert.kind === 'BUY_NOW'), true);
 });
 
 test('evaluateAlerts dedupes repeats and re-alerts only on a meaningful drop', () => {

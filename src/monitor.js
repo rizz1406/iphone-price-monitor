@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { writeReports } from './report.js';
-import { checkoutOf, evaluateAlerts, identityCheck, purchaseState } from './pricing.js';
+import { checkoutOf, evaluateAlerts, identityCheck, purchaseState, targetFor } from './pricing.js';
 
 const root = process.cwd();
 const config = JSON.parse(await readFile(path.join(root, 'config.json'), 'utf8'));
@@ -542,11 +542,113 @@ const extractAmazon = async (page, site, product) => {
   };
 };
 
+const setReliancePincode = async (page, pincode) => {
+  try {
+    const input = page.getByRole('textbox', { name: 'Enter Pincode' });
+    await input.waitFor({ state: 'visible', timeout: 10000 });
+    await input.fill(pincode);
+    await input.press('Enter');
+    await page.waitForTimeout(4000);
+  } catch (error) {
+    if (debug) console.log('Reliance pincode flow failed:', error.message);
+    return false;
+  }
+  const text = await page.locator('body').innerText().catch(() => '');
+  return text.includes(pincode);
+};
+
+const extractReliance = async (page, site, product) => {
+  await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(6000);
+  const pincodeSet = await setReliancePincode(page, config.pincode);
+  const text = await page.locator('body').innerText();
+  const jsonLd = await getProductJsonLd(page);
+  const offer = getOffer(jsonLd);
+  const productBlock = await page.locator('h1').first().locator('..').innerText().catch(() => '');
+  const listPrice = offerPrice(offer) ?? parseInr(productBlock.match(/₹\s?([\d,]+(?:\.\d+)?)/)?.[1]);
+  if (!listPrice) throw new Error('Could not extract Reliance Digital price');
+  const unavailable = /Currently unavailable online|Notify Me|Out of Stock|Sold Out/i.test(text);
+  const inStock = !unavailable && /Add to Cart|Buy Now/i.test(text);
+  const deliverable = pincodeSet ? (inStock ? true : false) : null;
+  return {
+    site: site.id,
+    product: product.id,
+    productName: product.name,
+    name: site.name,
+    checkedAt: new Date().toISOString(),
+    status: 'ok',
+    url: site.url,
+    title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
+    mrp: null,
+    listPrice,
+    checkoutPrice: listPrice,
+    effectivePrice: listPrice,
+    maxBankOffer: null,
+    bankOffers: [],
+    bankOffersDetailed: [],
+    bankOfferKind: 'none',
+    qualifiedPrice: null,
+    exchangeCeiling: null,
+    exchangeAvailable: /Exchange/i.test(text),
+    assumedExchangeValue: product.assumedExchangeValue ?? 0,
+    exchangeAdjustedPrice: product.assumedExchangeValue ? Math.max(0, listPrice - product.assumedExchangeValue) : null,
+    seller: 'Reliance Digital',
+    delivery: unavailable ? `Currently unavailable online for ${config.pincode}` : `Available for ${config.pincode}`,
+    deliveryNote: pincodeSet ? null : `pincode ${config.pincode} not confirmed on page`,
+    inStock,
+    deliverable,
+    cod: null,
+    pincodeSet,
+  };
+};
+
+const extractApple = async (page, site, product) => {
+  await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(5000);
+  const text = await page.locator('body').innerText();
+  const listPrice = parseInr(text.match(/MRP\s*₹\s?([\d,]+(?:\.\d+)?)/i)?.[1]);
+  if (!listPrice) throw new Error('Could not extract Apple India price');
+  const cashback = toNumber(text.match(/up to ₹\s?([\d,]+)[\s\S]{0,50}instant cashback/i)?.[1]);
+  const title = await page.title();
+  return {
+    site: site.id,
+    product: product.id,
+    productName: product.name,
+    name: site.name,
+    checkedAt: new Date().toISOString(),
+    status: 'ok',
+    url: site.url,
+    title,
+    mrp: listPrice,
+    listPrice,
+    checkoutPrice: listPrice,
+    effectivePrice: listPrice,
+    maxBankOffer: cashback,
+    bankOffers: cashback ? [{ bank: 'Eligible Apple partner card', amount: cashback }] : [],
+    bankOffersDetailed: cashback ? [{ bank: 'Eligible Apple partner card', amount: cashback, eligibility: 'unknown', verified: false, expires: null }] : [],
+    bankOfferKind: cashback ? 'instant' : 'none',
+    qualifiedPrice: null,
+    exchangeCeiling: null,
+    exchangeAvailable: true,
+    assumedExchangeValue: product.assumedExchangeValue ?? 0,
+    exchangeAdjustedPrice: product.assumedExchangeValue ? Math.max(0, listPrice - product.assumedExchangeValue) : null,
+    seller: 'Apple India',
+    delivery: 'Shown during checkout',
+    deliveryNote: `official baseline; delivery to ${config.pincode} not verified`,
+    inStock: !/currently unavailable|out of stock/i.test(text),
+    deliverable: null,
+    cod: false,
+    pincodeSet: false,
+  };
+};
+
 const extractors = {
   flipkart: extractFlipkart,
   croma: extractCroma,
   vijay: extractVijay,
   amazon: extractAmazon,
+  reliance: extractReliance,
+  apple: extractApple,
 };
 
 const resultKey = (result) => `${result.product ?? 'iphone17'}:${result.site}`;
@@ -631,7 +733,7 @@ const formatSite = (result) => {
   if (result.status === 'error') {
     return `${result.productName ?? result.name}: ${result.name} ERROR - ${result.error}\n${result.url}`;
   }
-  const target = config.target;
+  const target = targetFor(config, result.product);
   const lines = [`${result.productName ?? 'iPhone 17'} @ ${result.name}: ${result.title || result.productName}`];
   const price = checkoutOf(result);
   lines.push(

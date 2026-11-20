@@ -1,17 +1,28 @@
 {
   "pincode": "500055",
   "currency": "INR",
+  "purchasePlan": {
+    "notBefore": "2026-12-01",
+    "buyBy": "2026-12-31",
+    "strategy": "lowest_verified",
+    "benchmarkMonth": "2026-11",
+    "note": "Cash is expected in December. November is observation-only and becomes the benchmark for December."
+  },
   "target": {
-    "buyNow": 70000,
-    "strongDealMax": 74999,
-    "watchMax": 79999,
-    "note": "Primary target for iPhone 17 256GB Mist Blue, checkout price WITHOUT exchange. Single source of truth for all cards, forecasts and alerts."
+    "buyNow": 79900,
+    "strongDealMax": 82900,
+    "watchMax": 87900,
+    "excellentCheckout": 76900,
+    "qualifiedBankPrice": 74900,
+    "note": "Realistic iPhone 17 target: checkout price without exchange. Bank-qualified and exchange prices are shown separately and never drive the main verdict."
   },
   "alerts": {
     "cooldownHours": 12,
     "repeatDropAmount": 500,
     "dropAmount": 1000,
-    "dropPct": 0.02
+    "dropPct": 0.02,
+    "confirmationChecks": 2,
+    "confirmationTolerance": 200
   },
   "products": [
     {
@@ -22,6 +33,13 @@
       "expected": {
         "storage": "256GB",
         "color": "Mist Blue"
+      },
+      "target": {
+        "buyNow": 79900,
+        "strongDealMax": 82900,
+        "watchMax": 87900,
+        "excellentCheckout": 76900,
+        "qualifiedBankPrice": 74900
       },
       "assumedExchangeValue": 5000,
       "exchangeNote": "Assumed resale value of your M35 (max ₹5,000). Informational only — exchange is never treated as a discount.",
@@ -86,6 +104,22 @@
           "headed": true,
           "url": "https://www.amazon.in/dp/B0FQFYXCC4",
           "note": "Amazon.in currently lists only Black/White iPhone 17 256GB. Mist Blue is not sold by Amazon, so the colour gate keeps this offer excluded."
+        },
+        {
+          "id": "reliance-digital",
+          "name": "Reliance Digital",
+          "type": "reliance",
+          "enabled": true,
+          "url": "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645",
+          "note": "Included only when the exact Mist Blue 256GB model is available online and delivery to 500055 is verified."
+        },
+        {
+          "id": "apple-india",
+          "name": "Apple India",
+          "type": "apple",
+          "enabled": true,
+          "url": "https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-mist-blue",
+          "note": "Official-price baseline. It is not treated as buyable until delivery is verifiable."
         }
       ]
     },
@@ -97,6 +131,11 @@
       "expected": {
         "storage": "256GB",
         "color": null
+      },
+      "target": {
+        "buyNow": 79900,
+        "strongDealMax": 84900,
+        "watchMax": 87900
       },
       "assumedExchangeValue": 0,
       "saleCalendar": [
@@ -141,6 +180,11 @@
       "expected": {
         "storage": "256GB",
         "color": null
+      },
+      "target": {
+        "buyNow": 64900,
+        "strongDealMax": 69900,
+        "watchMax": 72900
       },
       "assumedExchangeValue": 0,
       "saleCalendar": [

@@ -59,13 +59,14 @@ jobs:
           commit_message: ${{ steps.commitmsg.outputs.msg }}
           file_pattern: "data/*.json data/*.jsonl data/alert-headline.txt dashboard.html reports/*.md"
 
-      - name: Chain next run in ~30 min
+      - name: Chain next run (faster during configured sale windows)
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          sleep $((1680 + RANDOM % 120))
+          delay=$(node -e "const c=require('./config.json');const d=new Date().toISOString().slice(0,10);const active=c.products.some(p=>(p.saleCalendar||[]).some(s=>d>=s.start&&d<=s.end));process.stdout.write(String(active?480:1680))")
+          sleep $((delay + RANDOM % 120))
           for i in 1 2 3 4 5; do
             code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
               -H "Authorization: Bearer $GH_TOKEN" \

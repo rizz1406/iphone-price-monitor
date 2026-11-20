@@ -3,6 +3,11 @@
 
 export const DEFAULT_TARGET = { buyNow: 70000, strongDealMax: 74999, watchMax: 79999 };
 
+export const targetFor = (config, productId) =>
+  config?.products?.find((product) => product.id === productId)?.target ??
+  config?.target ??
+  DEFAULT_TARGET;
+
 const moneyText = (value) => `₹${Math.round(value).toLocaleString('en-IN')}`;
 const previousMinText = (value) => moneyText(value);
 
@@ -64,7 +69,7 @@ export const identityCheck = (observation, product) => {
 // Availability rules: only verified in-stock + verified delivery is purchasable.
 // Unknown delivery/stock is never treated as available.
 export const purchaseState = (observation, config) => {
-  const target = config?.target ?? DEFAULT_TARGET;
+  const target = targetFor(config, observation?.product);
   const price = checkoutOf(observation);
   const blockers = [];
   if (observation?.status !== 'ok') blockers.push('SCRAPE_FAILED');
@@ -94,6 +99,7 @@ const isUsable = (entry, productId) =>
   entry &&
   entry.status === 'ok' &&
   (entry.product ?? 'iphone17') === productId &&
+  entry.purchase?.purchasable === true &&
   checkoutOf(entry) &&
   checkoutOf(entry) >= 1000 &&
   checkoutOf(entry) <= 500000;
@@ -263,12 +269,18 @@ const ALERT_RANK = { BUY_NOW: 5, STRONG_DEAL: 4, RECORD_LOW: 3, PRICE_DROP: 2, S
 export const evaluateAlerts = ({ result, previous, history = [], config, state = {}, now = new Date().toISOString() }) => {
   const alerts = [];
   const newState = { ...state };
-  const target = config?.target ?? DEFAULT_TARGET;
+  const target = targetFor(config, result?.product);
   const cooldownMs = (config?.alerts?.cooldownHours ?? 12) * 3600000;
   const repeatDrop = config?.alerts?.repeatDropAmount ?? 500;
   const dropAmount = config?.alerts?.dropAmount ?? 1000;
   const dropPct = config?.alerts?.dropPct ?? 0.02;
+  const confirmationChecks = Math.max(1, config?.alerts?.confirmationChecks ?? 1);
+  const confirmationTolerance = config?.alerts?.confirmationTolerance ?? 200;
   const nowMs = new Date(now).getTime();
+  const notBefore = config?.purchasePlan?.notBefore
+    ? new Date(`${config.purchasePlan.notBefore}T00:00:00+05:30`).getTime()
+    : null;
+  const purchaseWindowOpen = !notBefore || nowMs >= notBefore;
   const purchase = purchaseState(result, config);
   const previousPrice = checkoutOf(previous);
   const currentPrice = purchase.price;
@@ -280,10 +292,17 @@ export const evaluateAlerts = ({ result, previous, history = [], config, state =
         entry.status === 'ok' &&
         (entry.product ?? 'iphone17') === result.product &&
         entry.site === result.site &&
+        entry.purchase?.purchasable === true &&
         checkoutOf(entry)
     )
     .map((entry) => ({ ...entry, price: checkoutOf(entry) }))
     .sort((a, b) => new Date(a.checkedAt) - new Date(b.checkedAt));
+
+  const confirmationHistory = siteHistory.slice(-(confirmationChecks - 1));
+  const priceConfirmed =
+    confirmationChecks === 1 ||
+    (confirmationHistory.length === confirmationChecks - 1 &&
+      confirmationHistory.every((entry) => Math.abs(entry.price - currentPrice) <= confirmationTolerance));
 
   const firedKey = (kind) => `${result.product}:${result.site}:${kind}`;
   const shouldFire = (kind, price) => {
@@ -316,7 +335,7 @@ export const evaluateAlerts = ({ result, previous, history = [], config, state =
   };
 
   // RECORD LOW: strictly below every previously verified price for this site.
-  if (purchase.purchasable && siteHistory.length >= 3) {
+  if (purchase.purchasable && priceConfirmed && siteHistory.length >= 3) {
     const priorMin = Math.min(...siteHistory.map((entry) => entry.price));
     if (currentPrice < priorMin && shouldFire('RECORD_LOW', currentPrice)) {
       record('RECORD_LOW', `new verified low — previous best ${previousMinText(priorMin)}`);
@@ -324,7 +343,7 @@ export const evaluateAlerts = ({ result, previous, history = [], config, state =
   }
 
   // BUY NOW / STRONG DEAL — availability and verification are hard gates.
-  if (purchase.purchasable) {
+  if (purchase.purchasable && priceConfirmed && purchaseWindowOpen) {
     if (purchase.tier.tier === 'BUY' && shouldFire('BUY_NOW', currentPrice)) {
       record('BUY_NOW', `checkout ${moneyText(currentPrice)} is at or below your ${moneyText(target.buyNow)} target`);
     } else if (purchase.tier.tier === 'STRONG_DEAL' && shouldFire('STRONG_DEAL', currentPrice)) {
@@ -333,7 +352,7 @@ export const evaluateAlerts = ({ result, previous, history = [], config, state =
   }
 
   // PRICE DROP vs the last verified price (BUY/STRONG already covers target crossings).
-  if (purchase.purchasable && previousPrice && currentPrice < previousPrice) {
+  if (purchase.purchasable && priceConfirmed && previousPrice && currentPrice < previousPrice) {
     const amount = previousPrice - currentPrice;
     const pct = amount / previousPrice;
     const isTargetAlert = alerts.some((alert) => alert.kind === 'BUY_NOW' || alert.kind === 'STRONG_DEAL');
@@ -344,7 +363,7 @@ export const evaluateAlerts = ({ result, previous, history = [], config, state =
 
   // SALE STARTED: a calendar sale is live AND the price actually moved vs the 7-day median.
   const activeSales = config?.activeSales ?? [];
-  if (purchase.purchasable && activeSales.length) {
+  if (purchase.purchasable && priceConfirmed && activeSales.length) {
     const recent = siteHistory.filter((entry) => nowMs - new Date(entry.checkedAt).getTime() <= 7 * 86400000);
     const med7 = median(recent.map((entry) => entry.price));
     if (med7 && currentPrice <= med7 * 0.99) {
