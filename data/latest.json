@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-20T08:08:11.025Z",
+  "updatedAt": "2026-11-20T08:38:46.466Z",
   "pincode": "500055",
   "sites": [
     {
@@ -7,7 +7,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T08:06:20.078Z",
+      "checkedAt": "2026-11-20T08:37:11.279Z",
       "status": "ok",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
       "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
@@ -105,7 +105,7 @@
       "deliverable": true,
       "cod": false,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-20T08:06:20.078Z",
+      "verifiedAt": "2026-11-20T08:37:11.279Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -132,7 +132,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Croma",
-      "checkedAt": "2026-11-20T08:06:33.111Z",
+      "checkedAt": "2026-11-20T08:37:23.988Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -156,7 +156,7 @@
       "deliverable": false,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-20T08:06:33.111Z",
+      "verifiedAt": "2026-11-20T08:37:23.988Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -185,7 +185,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-20T08:06:45.399Z",
+      "checkedAt": "2026-11-20T08:37:30.622Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
@@ -253,7 +253,7 @@
       "deliverable": null,
       "cod": null,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T08:06:45.399Z",
+      "verifiedAt": "2026-11-20T08:37:30.622Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -282,7 +282,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Amazon",
-      "checkedAt": "2026-11-20T08:07:06.622Z",
+      "checkedAt": "2026-11-20T08:37:52.055Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0FQFYXCC4",
       "title": "Apple iPhone 17 256 GB: 15.93 cm (6.3″) Display with Promotion, A19 Chip, Center Stage Front Camera for Smarter Group Selfies, Improved Scratch Resistance, All-Day Battery Life; Black",
@@ -306,7 +306,7 @@
       "deliverable": null,
       "cod": null,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T08:07:06.622Z",
+      "verifiedAt": "2026-11-20T08:37:52.055Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": false,
@@ -336,7 +336,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T08:07:32.952Z",
+      "checkedAt": "2026-11-20T08:38:08.841Z",
       "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
       "title": "Samsung Galaxy S26 5G (White, 256 GB) (12 GB RAM)",
@@ -376,17 +376,17 @@
       "bankOfferKind": "instant",
       "qualifiedPrice": null,
       "exchangeCeiling": 65750,
-      "exchangeAvailable": true,
+      "exchangeAvailable": false,
       "assumedExchangeValue": 0,
       "exchangeAdjustedPrice": null,
       "seller": "BTPLD",
-      "delivery": "Tuesday, 24 Nov",
-      "deliveryNote": "pincode 500055 not confirmed on page",
+      "delivery": null,
+      "deliveryNote": null,
       "inStock": true,
-      "deliverable": null,
+      "deliverable": false,
       "cod": false,
-      "pincodeSet": false,
-      "verifiedAt": "2026-11-20T08:07:32.952Z",
+      "pincodeSet": true,
+      "verifiedAt": "2026-11-20T08:38:08.841Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -395,7 +395,7 @@
       "purchase": {
         "purchasable": false,
         "blockers": [
-          "DELIVERY_UNVERIFIED"
+          "NOT_DELIVERABLE"
         ],
         "price": 87999,
         "tier": {
@@ -415,7 +415,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Amazon",
-      "checkedAt": "2026-11-20T08:07:44.400Z",
+      "checkedAt": "2026-11-20T08:38:20.074Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0GL87VP7N",
       "title": "Samsung Galaxy S26 5G (Cobalt Violet, 12GB RAM, 256GB Storage), AI Phone, Photo Assist, Creative Studio, 50MP Camera with ProVisual Engine, Powerful Customized Processor and 4300mAh Battery",
@@ -439,7 +439,7 @@
       "deliverable": null,
       "cod": null,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T08:07:44.400Z",
+      "verifiedAt": "2026-11-20T08:38:20.074Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -468,7 +468,7 @@
       "product": "galaxy-s25",
       "productName": "Galaxy S25 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T08:08:10.875Z",
+      "checkedAt": "2026-11-20T08:38:46.323Z",
       "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537",
       "title": "Samsung Galaxy S25 5G Snapdragon (Navy, 256 GB) (12 GB RAM)",
@@ -518,7 +518,7 @@
       "deliverable": null,
       "cod": false,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T08:08:10.875Z",
+      "verifiedAt": "2026-11-20T08:38:46.323Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
