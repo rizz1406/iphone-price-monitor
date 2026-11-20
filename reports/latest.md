@@ -1,14 +1,14 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 7:57 am IST
+**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 8:29 am IST
 
 ## iPhone 17 256GB Mist Blue
 
 | Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | WAIT | ❌ not deliverable to pincode | **₹82,900** | — | — | — | 20 Nov 2026, 7:54 am |
-| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ❌ delivery unverified | **₹93,990** | — | ₹10,000 | ₹5,000 assumed → ₹88,990 | 20 Nov 2026, 7:54 am |
-| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ delivery unverified, colour unverified | **₹94,490** | ₹99,900 | — | — | 20 Nov 2026, 7:54 am |
+| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ❌ delivery unverified | **₹93,990** | — | ₹10,000 | ₹5,000 assumed → ₹88,990 | 20 Nov 2026, 8:27 am |
+| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ delivery unverified, colour unverified | **₹94,490** | ₹99,900 | — | — | 20 Nov 2026, 8:27 am |
 | [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | — | ❌ Error | last known: see dashboard | — | — | — | — |
+| [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | — | ❌ Error | last known: see dashboard | — | — | — | — |
 
 ### 📈 Forecast
 - Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 118 over 6 unique days
@@ -29,7 +29,7 @@
 
 | Site | Tier | Purchasable | Checkout | M.R.P. | Bank offer (unverified) | Exchange (optional) | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT | ❌ delivery unverified | **₹87,999** | ₹1,17,999 | — | — | 20 Nov 2026, 7:56 am |
+| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT | ❌ delivery unverified | **₹87,999** | ₹1,17,999 | — | — | 20 Nov 2026, 8:28 am |
 | [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | — | ❌ Error | last known: see dashboard | — | — | — | — |
 
 ### 📈 Forecast
