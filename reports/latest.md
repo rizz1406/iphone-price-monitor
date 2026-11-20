@@ -1,5 +1,5 @@
 # 📱 Price Monitor — iPhone 17 · Galaxy S25 · Galaxy S26
-**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 5:17 pm IST
+**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹70,000 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 20 Nov 2026, 5:37 pm IST
 
 ## iPhone 17 256GB Mist Blue
 
@@ -14,6 +14,9 @@
 - Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 133 over 6 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 6 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- Lowest verified price ever: **₹82,900** at Croma (13 Nov 2026) — ₹12,900 above target
+- Store notes:
+  - **Amazon:** Amazon.in currently lists only Black/White iPhone 17 256GB. Mist Blue is not sold by Amazon, so the colour gate keeps this offer excluded.
 - **Conservative:** ₹89,100 – ₹95,000 (price holds near its recent level)
 - **Expected:** ₹88,900 – ₹89,100 (reverts toward the observed low)
 - **Aggressive:** ₹86,200 – ₹88,900 (below anything observed so far — low probability, not evidence-based)
@@ -36,6 +39,7 @@
 - Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 116 over 4 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- Lowest verified price ever: **₹87,999** at Flipkart (17 Nov 2026) — ₹17,999 above target
 - **Conservative:** ₹88,000 – ₹88,000 (price holds near its recent level)
 - **Expected:** ₹88,000 – ₹88,000 (reverts toward the observed low)
 - **Aggressive:** ₹85,400 – ₹88,000 (below anything observed so far — low probability, not evidence-based)
@@ -55,6 +59,7 @@
 - Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 116 over 4 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 4 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
+- Lowest verified price ever: **₹72,999** at Flipkart (17 Nov 2026) — ₹2,999 above target
 - **Conservative:** ₹73,000 – ₹73,000 (price holds near its recent level)
 - **Expected:** ₹73,000 – ₹73,000 (reverts toward the observed low)
 - **Aggressive:** ₹70,800 – ₹73,000 (below anything observed so far — low probability, not evidence-based)

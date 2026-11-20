@@ -84,7 +84,8 @@
           "type": "amazon",
           "enabled": true,
           "headed": true,
-          "url": "https://www.amazon.in/dp/B0FQFYXCC4"
+          "url": "https://www.amazon.in/dp/B0FQFYXCC4",
+          "note": "Amazon.in currently lists only Black/White iPhone 17 256GB. Mist Blue is not sold by Amazon, so the colour gate keeps this offer excluded."
         }
       ]
     },

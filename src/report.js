@@ -23,6 +23,18 @@ const istDate = (value) =>
 const productOf = (entry, products) =>
   products.find((product) => product.id === (entry.product ?? 'iphone17')) ?? null;
 
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
+
+const lifetimeLowFor = (historyEntries, productId) => {
+  let lowest = null;
+  for (const entry of historyEntries) {
+    if ((entry.product ?? 'iphone17') !== productId || entry.status !== 'ok' || !checkoutOf(entry)) continue;
+    if (!lowest || checkoutOf(entry) < checkoutOf(lowest)) lowest = entry;
+  }
+  return lowest;
+};
+
 const lastKnownGood = (historyEntries, productId, siteId) =>
   [...historyEntries]
     .reverse()
@@ -62,7 +74,7 @@ const stale = (iso) => iso && Date.now() - new Date(iso).getTime() > STALE_MS;
 // Interactive chart: time-based x-axis, monotone-cubic smoothing (no overshoot on
 // flat plateaus), padded y-domain so flat series still render mid-chart, animated
 // draw-in, min/max dots, axis dates and hover crosshair + tooltip. Inline, no deps.
-const chart = (entries, id) => {
+const chart = (entries, id, target = null) => {
   const values = entries.map((entry) => checkoutOf(entry));
   if (values.length < 2) return '';
   const W = 320;
@@ -76,6 +88,8 @@ const chart = (entries, id) => {
   const pad = Math.max(span * 0.18, Math.round(max * 0.004) || 50);
   const lo = min - pad;
   const hi = max + pad;
+  const targetY = target ? H - PAD_BOTTOM - ((target - lo) / (hi - lo)) * (H - PAD_TOP - PAD_BOTTOM) : null;
+  const targetInRange = targetY !== null && target > lo && target < hi;
   const times = entries.map((entry) => new Date(entry.checkedAt).getTime());
   const t0 = Math.min(...times);
   const t1 = Math.max(...times);
@@ -147,12 +161,15 @@ const chart = (entries, id) => {
             <line class="chart-grid chart-grid-hi" x1="0" y1="${PAD_TOP}" x2="${W}" y2="${PAD_TOP}"/>
             ${flatish ? '' : `<path class="chart-area" d="${areaPath}" fill="url(#fill-${id})"/>`}
             <path class="chart-line" d="${linePath}" pathLength="1"/>
+            ${targetInRange ? `<line class="chart-target" x1="0" y1="${targetY.toFixed(1)}" x2="${W}" y2="${targetY.toFixed(1)}"/>` : ''}
             ${minIdx !== maxIdx ? dot(minIdx, 'lo') : ''}
             ${minIdx !== maxIdx ? dot(maxIdx, 'hi') : ''}
             <line class="chart-cross" x1="0" y1="${PAD_TOP - 10}" x2="0" y2="${H - PAD_BOTTOM}" style="display:none"/>
             <circle class="chart-hover-dot" r="4" style="display:none"/>
           </svg>
+          ${targetInRange ? `<div class="chart-target-label" style="top:${((targetY / H) * 100).toFixed(1)}%">Target ${money.format(target)}</div>` : ''}
           <div class="chart-axis"><span>${firstDate}</span><span>${lastDate}</span></div>
+          ${target && !targetInRange ? `<div class="chart-target-note">Target ${money.format(target)} — ${money.format(Math.abs(target - (target < min ? min : max)))} ${target < min ? 'below the lowest plotted price' : 'above the highest plotted price'}</div>` : ''}
           <div class="chart-tip" style="display:none"></div>
         </div>`;
 };
@@ -297,6 +314,25 @@ const heroHtml = (product, sorted, forecast, historyEntries, config, basisName, 
   const tier = best?.purchase?.tier ?? null;
   const badgeClass = tier?.tier === 'BUY' ? 'badge-ok' : tier?.tier === 'STRONG_DEAL' ? 'badge-best' : 'badge-neutral';
   const nextSale = forecast.upcoming[0] ?? null;
+  const lifetimeLow = lifetimeLowFor(historyEntries, product.id);
+  const realism = lifetimeLow
+    ? (() => {
+        const lowPrice = checkoutOf(lifetimeLow);
+        const above = lowPrice - target.buyNow;
+        return `<div class="realism">
+        <div class="realism-title">Is ${money.format(target.buyNow)} realistic?</div>
+        <div class="realism-grid">
+          <div><span class="stat-label">Lowest verified price ever</span><strong>${money.format(lowPrice)}</strong><span class="muted">${escapeHtml(lifetimeLow.name)} · ${istDate(lifetimeLow.checkedAt)}</span></div>
+          <div><span class="stat-label">${above > 0 ? 'Still above your target' : 'At or below your target'}</span><strong>${money.format(Math.abs(above))}</strong><span class="muted">${above > 0 ? `${((above / lowPrice) * 100).toFixed(1)}% above ${money.format(target.buyNow)}` : 'target reached'}</span></div>
+        </div>
+        <p class="realism-note">${
+          above > 0
+            ? `The target has never been observed in ${stats.uniqueDays} recorded days. Treat sub-${money.format(target.buyNow)} as a sale-event outcome, not a baseline.`
+            : 'The target has been observed at least once — watch for it to return.'
+        }</p>
+      </div>`;
+      })()
+    : '';
   return `
   <section class="hero">
     <div class="hero-main">
@@ -324,6 +360,7 @@ const heroHtml = (product, sorted, forecast, historyEntries, config, basisName, 
         <div><span class="stat-label">Next sale</span><strong>${nextSale ? `${nextSale.name} · ${nextSale.daysAway > 0 ? `in ${nextSale.daysAway} days` : 'live'}` : 'none configured'}</strong></div>
         <div><span class="stat-label">Verified</span><strong>${best?.verifiedAt ? `${istTime(best.verifiedAt)} IST` : 'n/a'}</strong></div>
       </div>
+      ${realism}
       ${
         forecast.insufficient
           ? `<p class="hero-note">Forecast is <strong>illustrative only</strong> — ${stats.uniqueDays} days of history, ${stats.count} observations. Need 14+ days for a reliable forecast.</p>`
@@ -420,6 +457,20 @@ export async function writeReports({ root, config, results, historyPath }) {
   }
   const topDrop = drops.sort((a, b) => b.amount - a.amount)[0] ?? null;
 
+  // Client-side only: instant bank offers listed by the stores. Never feeds
+  // checkout price, tiers, forecasts or alerts — purely an "if eligible" view.
+  const bankOptions = [
+    ...new Set(
+      hydrated
+        .filter((result) => result.status === 'ok')
+        .flatMap((result) =>
+          (result.bankOffersDetailed ?? [])
+            .filter((offer) => offer.kind !== 'emi' && offer.amount > 0)
+            .map((offer) => offer.bank)
+        )
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+
   // Global banner: live sale, else next estimated sale, else top drop. No price promises.
   const primary = state[0];
   const nextSale = primary.forecast.upcoming[0] ?? null;
@@ -483,6 +534,10 @@ export async function writeReports({ root, config, results, historyPath }) {
       purchase.tier.tier === 'BUY' ? 'badge-ok' : purchase.tier.tier === 'STRONG_DEAL' ? 'badge-best' : 'badge-neutral';
     const bestBank = r.bankOffers?.[0] ?? null;
     const identity = r.identity;
+    const instantOffers = (r.bankOffersDetailed ?? []).filter((offer) => offer.kind !== 'emi' && offer.amount > 0);
+    const bankMap = {};
+    for (const offer of instantOffers) bankMap[offer.bank] = Math.max(bankMap[offer.bank] ?? 0, offer.amount);
+    const siteNote = product.sites.find((site) => site.id === r.site)?.note ?? null;
 
     return `
         <div class="card ${r.site === bestDealId ? 'card-best' : ''}">
@@ -504,7 +559,7 @@ export async function writeReports({ root, config, results, historyPath }) {
                   : ''
               }
             </div>
-            ${chart(entries, `${product.id}-${r.site}`)}
+            ${chart(entries, `${product.id}-${r.site}`, target.buyNow)}
             ${rec ? `<div class="rec rec-${rec.kind}">${rec.kind === 'buy' ? '🟢' : rec.kind === 'watch' ? '🟡' : rec.kind === 'blocked' ? '🔴' : '🔵'} ${rec.text}</div>` : ''}
             ${
               price
@@ -517,6 +572,14 @@ export async function writeReports({ root, config, results, historyPath }) {
             }
             <div class="detail-row"><span class="detail-label">M.R.P.</span><span class="detail-value">${r.mrp ? money.format(r.mrp) : 'N/A'}</span></div>
             <div class="detail-row"><span class="detail-label">Best Bank Offer</span><span class="detail-value">${r.maxBankOffer ? `${money.format(r.maxBankOffer)}${bestBank ? ` (${bestBank.bank})` : ''} — eligibility unverified` : 'None'}</span></div>
+            ${
+              Object.keys(bankMap).length
+                ? `<div class="detail-row bank-adjusted" data-banks="${escapeHtml(JSON.stringify(bankMap))}" hidden>
+              <span class="detail-label">If bank offer applies</span>
+              <span class="detail-value"><strong class="bank-adjusted-price"></strong> <span class="bank-adjusted-note">unverified, excluded from tier & alerts</span></span>
+            </div>`
+                : ''
+            }
             <div class="detail-row"><span class="detail-label">Exchange (optional)</span><span class="detail-value">${
               r.assumedExchangeValue && r.exchangeAdjustedPrice
                 ? `assumed ${money.format(r.assumedExchangeValue)} → ${money.format(r.exchangeAdjustedPrice)} after exchange${r.exchangeCeiling ? ` (ceiling ${money.format(r.exchangeCeiling)})` : ''} — not a discount`
@@ -531,6 +594,7 @@ export async function writeReports({ root, config, results, historyPath }) {
                 : 'unverified'
             }</span></div>
             <div class="detail-row"><span class="detail-label">Verified</span><span class="detail-value">${r.verifiedAt ? `${istTime(r.verifiedAt)} IST` : 'N/A'}${isStale ? ' — stale' : ''}</span></div>
+            ${siteNote ? `<p class="site-note">${escapeHtml(siteNote)}</p>` : ''}
           </div>
           <a href="${r.url}" target="_blank" class="btn">View Product</a>
         </div>`;
@@ -697,6 +761,9 @@ export async function writeReports({ root, config, results, historyPath }) {
     .target-fill.hit { background: linear-gradient(90deg, rgba(74, 222, 128, 0.9), rgba(34, 197, 94, 0.75)); box-shadow: 0 0 10px rgba(74, 222, 128, 0.55); }
     @keyframes bar-fill { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
     .detail-row { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .detail-row[hidden] { display: none !important; }
+    .site-note { margin-top: 0.45rem; font-size: 0.75rem; color: var(--muted); }
+    .bank-adjusted-price { color: var(--warning); }
     .detail-row:last-child { border-bottom: none; }
     .detail-label { color: var(--muted); white-space: nowrap; }
     .detail-value { font-weight: 500; text-align: right; }
@@ -706,6 +773,14 @@ export async function writeReports({ root, config, results, historyPath }) {
     .chart-hi { top: 2px; }
     .chart-lo { bottom: 20px; }
     .chart-axis { display: flex; justify-content: space-between; margin-top: 0.15rem; font-size: 0.66rem; color: var(--muted); }
+    .chart-target { stroke: var(--warning); stroke-width: 1.2; stroke-dasharray: 4 3; opacity: 0.85; }
+    .chart-target-label {
+      position: absolute; left: 2px; transform: translateY(-50%); pointer-events: none;
+      font-size: 0.6rem; font-weight: 700; color: var(--warning);
+      background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 9999px; padding: 0.05rem 0.4rem; white-space: nowrap;
+    }
+    .chart-target-note { font-size: 0.68rem; color: var(--warning); margin-top: 0.15rem; }
     .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: chart-draw 1.4s cubic-bezier(.4,0,.2,1) forwards; }
     [data-variant="success"] .chart-line { stroke: var(--success); }
     [data-variant="error"] .chart-line { stroke: var(--error); }
@@ -787,6 +862,15 @@ export async function writeReports({ root, config, results, historyPath }) {
     .hero-stats .stat-label { display: block; margin-bottom: 0.2rem; }
     .hero-stats strong { font-size: 0.92rem; font-weight: 600; }
     .hero-note { margin-top: 0.8rem; font-size: 0.85rem; color: var(--warning); }
+    .realism {
+      margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 1rem;
+      background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.25);
+    }
+    .realism-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warning); margin-bottom: 0.5rem; }
+    .realism-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; }
+    .realism-grid strong { display: block; font-size: 1.05rem; margin-top: 0.15rem; }
+    .realism-grid .muted { font-size: 0.72rem; color: var(--muted); }
+    .realism-note { margin-top: 0.55rem; font-size: 0.8rem; color: var(--muted); }
     .forecast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.7rem; margin-bottom: 0.9rem; }
     .stat { background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.65rem 0.75rem; }
     .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -834,6 +918,17 @@ export async function writeReports({ root, config, results, historyPath }) {
           ${products.map((product) => `<option value="${product.id}">${product.shortName}</option>`).join('')}
         </select>
       </div>
+      ${
+        bankOptions.length
+          ? `<div class="filter-row">
+        <span class="filter-label">Bank (if eligible)</span>
+        <select id="bank-select" class="filter-select" aria-label="Bank offer estimate (unverified)">
+          <option value="">None</option>
+          ${bankOptions.map((bank) => `<option value="${escapeHtml(bank)}">${escapeHtml(bank)}</option>`).join('')}
+        </select>
+      </div>`
+          : ''
+      }
       <div class="subtitle">Last updated: <strong>${istTime(now)}</strong> IST · refresh in <span id="refresh-count">5:00</span></div>
     </div>
   </header>
@@ -906,6 +1001,36 @@ export async function writeReports({ root, config, results, historyPath }) {
           try { localStorage.setItem('priceFilter', filterEl.value); } catch (e) {}
         });
       }
+    })();
+    (function () {
+      const select = document.getElementById('bank-select');
+      if (!select) return;
+      const rows = document.querySelectorAll('.bank-adjusted');
+      const apply = function () {
+        const bank = select.value;
+        rows.forEach(function (row) {
+          let map = {};
+          try { map = JSON.parse(row.getAttribute('data-banks') || '{}'); } catch (e) {}
+          const amount = bank ? map[bank] : null;
+          const card = row.closest('.card');
+          const priceEl = card ? card.querySelector('.price-main') : null;
+          const price = priceEl ? Number(priceEl.textContent.replace(/[^0-9]/g, '')) : 0;
+          if (!amount || !price) { row.hidden = true; return; }
+          row.hidden = false;
+          const valueEl = row.querySelector('.bank-adjusted-price');
+          if (valueEl) valueEl.textContent = '₹' + Math.max(0, price - amount).toLocaleString('en-IN');
+          const noteEl = row.querySelector('.bank-adjusted-note');
+          if (noteEl) noteEl.textContent = 'assumes ₹' + amount.toLocaleString('en-IN') + ' instant discount — unverified, excluded from tier & alerts';
+        });
+      };
+      let saved = '';
+      try { saved = localStorage.getItem('bankFilter') || ''; } catch (e) {}
+      if ([...select.options].some(function (option) { return option.value === saved; })) select.value = saved;
+      apply();
+      select.addEventListener('change', function () {
+        apply();
+        try { localStorage.setItem('bankFilter', select.value); } catch (e) {}
+      });
     })();
     (function () {
       const W = 320, H = 100;
@@ -998,6 +1123,20 @@ export async function writeReports({ root, config, results, historyPath }) {
       `- Basis: verified **${basisName}** checkout prices only (stores that cannot deliver are excluded)`,
       `- ${forecast.message}`
     );
+    const lifetimeLow = lifetimeLowFor(historyEntries, product.id);
+    if (lifetimeLow) {
+      const lowPrice = checkoutOf(lifetimeLow);
+      mdLines.push(
+        `- Lowest verified price ever: **${money.format(lowPrice)}** at ${lifetimeLow.name} (${istDate(lifetimeLow.checkedAt)}) — ${
+          lowPrice > config.target.buyNow ? `${money.format(lowPrice - config.target.buyNow)} above target` : 'target reached'
+        }`
+      );
+    }
+    const siteNotes = product.sites.filter((site) => site.note);
+    if (siteNotes.length) {
+      mdLines.push(`- Store notes:`);
+      for (const site of siteNotes) mdLines.push(`  - **${site.name}:** ${site.note}`);
+    }
     if (forecast.scenarios) {
       for (const [key, name] of [
         ['conservative', 'Conservative'],

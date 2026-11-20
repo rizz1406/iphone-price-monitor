@@ -229,42 +229,53 @@ const extractFlipkart = async (page, site, product) => {
   throw lastError;
 };
 
+// Croma's pincode widget only submits its "Continue" button in the mobile
+// breakpoint (desktop shows a sign-in-only panel). Run the page at a phone
+// viewport, type the pincode so the form validates, then let the site's own
+// XHRs (price + delivery) run for 500055.
 const setCromaPincode = async (page, pincode) => {
-  const input = page.locator('input[placeholder="Enter Pincode"]').first();
-  const inputVisible = await input.isVisible().catch(() => false);
-  if (!inputVisible) {
-    const add = page.locator('button:visible').filter({ hasText: 'Add Pincode' }).first();
-    if (await add.count()) await add.click({ timeout: 5000 }).catch(() => {});
-    await page.waitForTimeout(1500);
+  try {
+    await page.locator('.add-pincode-link').first().click({ timeout: 6000 }).catch(async () => {
+      await page.locator('.add-pincode-link').first().evaluate((el) => el.click());
+    });
+    await page.waitForTimeout(2000);
+    const input = page.locator('input.pinElem:visible').first();
+    await input.waitFor({ state: 'visible', timeout: 8000 });
+    await input.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type(pincode, { delay: 120 });
+    await page.waitForTimeout(900);
+    await page.locator('#apply-pincode-btn').click({ timeout: 5000, force: true }).catch(async () => {
+      await page.locator('#apply-pincode-btn').evaluate((el) => el.click()).catch(() => {});
+    });
+    await page.waitForTimeout(6000);
+  } catch (error) {
+    if (debug) console.log('Croma pincode flow failed:', error.message);
+    return false;
   }
-  if (!(await input.count())) return;
-  await input.fill(pincode).catch(() => {});
-  const continueButton = page.locator('button:visible').filter({ hasText: 'Continue' }).first();
-  if (await continueButton.count()) {
-    await continueButton.click({ timeout: 5000 }).catch(() => {});
-  }
-  await page
-    .waitForFunction((pin) => document.body.innerText.includes(pin), pincode, { timeout: 10000 })
-    .catch(() => {});
-  await page.waitForTimeout(4000);
+  const text = await page.locator('body').innerText().catch(() => '');
+  return text.includes(pincode);
 };
 
-const extractCroma = async (page, site, product) => {
+const extractCromaOnce = async (page, site, product) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(6000);
   let text = await page.locator('body').innerText();
   if (/Access Denied|don't have permission to access/i.test(text)) {
     throw new Error('Croma blocked the request (Akamai Access Denied)');
   }
-  await setCromaPincode(page, config.pincode);
+  const pincodeSet = await setCromaPincode(page, config.pincode);
+  if (pincodeSet) await page.waitForTimeout(2000);
   text = await page.locator('body').innerText();
   const jsonLd = await getProductJsonLd(page);
   const offer = getOffer(jsonLd);
   const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Croma price');
-  const pincodeSet = text.includes(config.pincode);
   const negativeDelivery = /Not Available for your pincode/i.test(text);
   const deliverable = negativeDelivery ? false : pincodeSet ? true : null;
+  const mrp = toNumber(text.match(/M\.?R\.?P\.?:?\s*₹\s?([\d,]+)/i)?.[1]);
 
   return {
     site: site.id,
@@ -275,7 +286,7 @@ const extractCroma = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
-    mrp: null,
+    mrp: mrp && mrp > listPrice ? mrp : null,
     listPrice,
     checkoutPrice: listPrice,
     effectivePrice: listPrice,
@@ -300,21 +311,64 @@ const extractCroma = async (page, site, product) => {
   };
 };
 
+const extractCroma = async (page, site, product) => {
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      return await extractCromaOnce(page, site, product);
+    } catch (error) {
+      lastError = error;
+      if (debug) console.log(`Croma attempt ${attempt} failed: ${error.message}`);
+      if (attempt < 2) await page.waitForTimeout(15000);
+    }
+  }
+  throw lastError;
+};
+
+const setVijayPincode = async (page, pincode) => {
+  try {
+    await page.getByText('Select your location', { exact: false }).first().click({ timeout: 6000 });
+    const input = page.locator('#pincode-inputbox');
+    await input.waitFor({ state: 'visible', timeout: 8000 });
+    await input.click();
+    await input.pressSequentially(pincode, { delay: 90 });
+    await page.waitForTimeout(900);
+    await page.locator('#pincode-btn').click({ timeout: 5000, force: true }).catch(async () => {
+      await page.locator('#pincode-btn').evaluate((el) => el.click()).catch(() => {});
+    });
+    await page.waitForTimeout(4000);
+    await page
+      .locator('.pincodepopupContainer img[alt="cross-logo"], .crossLogo img')
+      .first()
+      .click({ timeout: 4000 })
+      .catch(() => {});
+    await page.waitForTimeout(1500);
+  } catch (error) {
+    if (debug) console.log('Vijay pincode flow failed:', error.message);
+    return false;
+  }
+  const text = await page.locator('body').innerText().catch(() => '');
+  return new RegExp(`Available at [A-Za-z ]*${pincode}`, 'i').test(text) || (text.includes(pincode) && /Free delivery by/i.test(text));
+};
+
 const extractVijay = async (page, site, product) => {
   await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForTimeout(6000);
-  const text = await page.locator('body').innerText();
+  let text = await page.locator('body').innerText();
   if (/Access Denied|don't have permission to access/i.test(text)) {
     throw new Error('Vijay Sales blocked the request');
   }
+  const pincodeSet = await setVijayPincode(page, config.pincode);
+  if (pincodeSet) await page.waitForTimeout(1500);
+  text = await page.locator('body').innerText();
   const jsonLd = await getProductJsonLd(page);
   const offer = getOffer(jsonLd);
   const listPrice = offerPrice(offer) ?? toNumber(text.match(/₹([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Vijay Sales price');
   const bankOffers = parseVijayOffers(text);
   const maxBankOffer = bankOffers[0]?.amount ?? null;
-  const pincodeSet = text.includes(config.pincode);
   const inStock = /In stock/i.test(text) && !/Out of Stock|Sold Out|Currently Unavailable/i.test(text);
+  const mrp = toNumber(text.match(/M\.?R\.?P\.?:?\s*₹\s?([\d,]+)/i)?.[1]);
 
   return {
     site: site.id,
@@ -325,7 +379,7 @@ const extractVijay = async (page, site, product) => {
     status: 'ok',
     url: site.url,
     title: await page.locator('h1').first().innerText().catch(() => jsonLd?.name ?? ''),
-    mrp: null,
+    mrp: mrp && mrp > listPrice ? mrp : null,
     listPrice,
     checkoutPrice: listPrice,
     effectivePrice: listPrice,
@@ -358,6 +412,36 @@ const extractVijay = async (page, site, product) => {
   };
 };
 
+// Amazon sets serviceability via the global-location popover. Apply 500055
+// before reading the delivery promise so deliverable can be verified, not assumed.
+const setAmazonPincode = async (page, pincode) => {
+  const navText = async () => page.locator('#glow-ingress-line2').first().innerText().catch(() => '');
+  try {
+    if ((await navText()).includes(pincode)) return true;
+    await page.locator('#nav-global-location-popover-link').click({ timeout: 6000 });
+    const input = page.locator('#GLUXZipUpdateInput');
+    await input.waitFor({ state: 'visible', timeout: 8000 });
+    await input.click();
+    await input.pressSequentially(pincode, { delay: 90 });
+    await page.waitForTimeout(700);
+    await page.locator('#GLUXZipUpdate-announce').click({ timeout: 5000, force: true }).catch(async () => {
+      await page.locator('#GLUXZipUpdate').evaluate((el) => el.click()).catch(() => {});
+    });
+    await page
+      .waitForFunction(
+        (pin) => (document.querySelector('#glow-ingress-line2')?.textContent || '').includes(pin),
+        pincode,
+        { timeout: 12000 }
+      )
+      .catch(() => {});
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.waitForTimeout(2500);
+  } catch (error) {
+    if (debug) console.log('Amazon location flow failed:', error.message);
+  }
+  return (await navText()).includes(pincode);
+};
+
 const extractAmazon = async (page, site, product) => {
   const gotoWithRetry = async () => {
     try {
@@ -383,6 +467,8 @@ const extractAmazon = async (page, site, product) => {
     await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(6000);
   }
+  const pincodeSet = await setAmazonPincode(page, config.pincode);
+  await page.waitForTimeout(1500);
   text = await page.locator('body').innerText().catch(() => '');
   const jsonLd = await getProductJsonLd(page);
   const offer = getOffer(jsonLd);
@@ -396,6 +482,20 @@ const extractAmazon = async (page, site, product) => {
   const listPrice = offerPrice(offer) ?? domPrice ?? toNumber(text.match(/₹\s?([\d,]+)/)?.[1]);
   if (!listPrice) throw new Error('Could not extract Amazon price');
   const inStock = /In stock/i.test(text) || (await page.locator('#add-to-cart-button').count()) > 0;
+  const negativeDelivery = /cannot be delivered to this location|not deliverable|does not deliver to/i.test(text);
+  const delivery =
+    text.match(/FREE delivery\s+([^\n]+)/i)?.[1]?.trim() ??
+    text.match(/(?:Get it by|Delivery)\s*:?\s*([^\n]+)/i)?.[1]?.trim() ??
+    null;
+  const deliverable = negativeDelivery
+    ? false
+    : pincodeSet
+      ? inStock
+        ? delivery
+          ? true
+          : null
+        : false
+      : null;
   const mrp =
     toNumber(
       await page
@@ -429,12 +529,16 @@ const extractAmazon = async (page, site, product) => {
     assumedExchangeValue: product.assumedExchangeValue ?? 0,
     exchangeAdjustedPrice: null,
     seller: text.match(/Sold by\s*([^\n]+)/i)?.[1]?.trim() ?? 'Amazon',
-    delivery: text.match(/(?:FREE delivery|Delivery)[^\n]*([A-Z][a-z]+,?\s+\d+\s+[A-Z]+)/)?.[1]?.trim() ?? null,
-    deliveryNote: 'Amazon does not expose pincode serviceability without login — verify at checkout',
+    delivery,
+    deliveryNote: pincodeSet
+      ? deliverable === null
+        ? 'delivery date not shown for this pincode'
+        : null
+      : 'could not set pincode 500055 on Amazon',
     inStock,
-    deliverable: null,
+    deliverable,
     cod: null,
-    pincodeSet: false,
+    pincodeSet,
   };
 };
 
