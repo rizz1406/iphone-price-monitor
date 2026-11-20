@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-20T06:03:59.075Z",
+  "updatedAt": "2026-11-20T06:36:00.081Z",
   "pincode": "500055",
   "sites": [
     {
@@ -7,7 +7,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T06:02:11.837Z",
+      "checkedAt": "2026-11-20T06:32:49.911Z",
       "status": "ok",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
       "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
@@ -105,7 +105,7 @@
       "deliverable": true,
       "cod": false,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-20T06:02:11.837Z",
+      "verifiedAt": "2026-11-20T06:32:49.911Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -132,85 +132,31 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Croma",
-      "checkedAt": "2026-11-20T06:02:21.140Z",
-      "status": "error",
-      "error": "Could not extract Croma price",
-      "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400"
-    },
-    {
-      "site": "vijay-sales",
-      "product": "iphone17",
-      "productName": "iPhone 17 256GB Mist Blue",
-      "name": "Vijay Sales",
-      "checkedAt": "2026-11-20T06:02:32.883Z",
+      "checkedAt": "2026-11-20T06:33:02.625Z",
       "status": "ok",
-      "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
-      "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
+      "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
+      "title": "Apple iPhone 17 (256GB, Mist Blue)",
       "mrp": null,
-      "listPrice": 93990,
-      "checkoutPrice": 93990,
-      "effectivePrice": 93990,
-      "maxBankOffer": 10000,
-      "bankOffers": [
-        {
-          "bank": "HSBC TAJ Bank Credit Card EMI",
-          "amount": 10000,
-          "type": "20%"
-        },
-        {
-          "bank": "HDFC Bank Credit Card/Debit Card EMI 6 Months and Above Tenures",
-          "amount": 4000,
-          "type": "flat"
-        },
-        {
-          "bank": "ICICI Bank Credit Card EMI on 6 Months and Above",
-          "amount": 3500,
-          "type": "flat"
-        }
-      ],
-      "bankOffersDetailed": [
-        {
-          "bank": "HSBC TAJ Bank Credit Card EMI",
-          "amount": 10000,
-          "minTxn": null,
-          "eligibility": "unknown",
-          "verified": false,
-          "expires": null,
-          "kind": "emi"
-        },
-        {
-          "bank": "HDFC Bank Credit Card/Debit Card EMI 6 Months and Above Tenures",
-          "amount": 4000,
-          "minTxn": null,
-          "eligibility": "unknown",
-          "verified": false,
-          "expires": null,
-          "kind": "emi"
-        },
-        {
-          "bank": "ICICI Bank Credit Card EMI on 6 Months and Above",
-          "amount": 3500,
-          "minTxn": null,
-          "eligibility": "unknown",
-          "verified": false,
-          "expires": null,
-          "kind": "emi"
-        }
-      ],
-      "bankOfferKind": "emi",
+      "listPrice": 82900,
+      "checkoutPrice": 82900,
+      "effectivePrice": 82900,
+      "maxBankOffer": null,
+      "bankOffers": [],
+      "bankOffersDetailed": [],
+      "bankOfferKind": "none",
       "qualifiedPrice": null,
       "exchangeCeiling": null,
-      "exchangeAvailable": true,
-      "assumedExchangeValue": 5000,
-      "exchangeAdjustedPrice": 88990,
-      "seller": "Vijay Sales",
-      "delivery": "Tomorrow",
-      "deliveryNote": "delivery not verified for pincode 500055",
+      "exchangeAvailable": false,
+      "assumedExchangeValue": null,
+      "exchangeAdjustedPrice": null,
+      "seller": "Croma",
+      "delivery": "Not available for 500055",
+      "deliveryNote": null,
       "inStock": true,
-      "deliverable": null,
+      "deliverable": false,
       "cod": null,
-      "pincodeSet": false,
-      "verifiedAt": "2026-11-20T06:02:32.883Z",
+      "pincodeSet": true,
+      "verifiedAt": "2026-11-20T06:33:02.625Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -219,9 +165,9 @@
       "purchase": {
         "purchasable": false,
         "blockers": [
-          "DELIVERY_UNVERIFIED"
+          "NOT_DELIVERABLE"
         ],
-        "price": 93990,
+        "price": 82900,
         "tier": {
           "tier": "WAIT",
           "label": "WAIT",
@@ -235,11 +181,21 @@
       }
     },
     {
+      "site": "vijay-sales",
+      "product": "iphone17",
+      "productName": "iPhone 17 256GB Mist Blue",
+      "name": "Vijay Sales",
+      "checkedAt": "2026-11-20T06:34:32.716Z",
+      "status": "error",
+      "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue\", waiting until \"domcontentloaded\"\n",
+      "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue"
+    },
+    {
       "site": "amazon",
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Amazon",
-      "checkedAt": "2026-11-20T06:02:54.239Z",
+      "checkedAt": "2026-11-20T06:34:54.923Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0FQFYXCC4",
       "title": "Apple iPhone 17 256 GB: 15.93 cm (6.3″) Display with Promotion, A19 Chip, Center Stage Front Camera for Smarter Group Selfies, Improved Scratch Resistance, All-Day Battery Life; Black",
@@ -263,7 +219,7 @@
       "deliverable": null,
       "cod": null,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T06:02:54.239Z",
+      "verifiedAt": "2026-11-20T06:34:54.923Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": false,
@@ -293,7 +249,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T06:03:20.488Z",
+      "checkedAt": "2026-11-20T06:35:21.708Z",
       "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
       "title": "Samsung Galaxy S26 5G (White, 256 GB) (12 GB RAM)",
@@ -343,7 +299,7 @@
       "deliverable": null,
       "cod": false,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T06:03:20.488Z",
+      "verifiedAt": "2026-11-20T06:35:21.708Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -372,7 +328,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Amazon",
-      "checkedAt": "2026-11-20T06:03:31.778Z",
+      "checkedAt": "2026-11-20T06:35:33.205Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0GL87VP7N",
       "title": "Samsung Galaxy S26 5G (Cobalt Violet, 12GB RAM, 256GB Storage), AI Phone, Photo Assist, Creative Studio, 50MP Camera with ProVisual Engine, Powerful Customized Processor and 4300mAh Battery",
@@ -390,13 +346,13 @@
       "assumedExchangeValue": 0,
       "exchangeAdjustedPrice": null,
       "seller": "Clicktech Retail Private Ltd",
-      "delivery": "Tuesday, 24 N",
+      "delivery": null,
       "deliveryNote": "Amazon does not expose pincode serviceability without login — verify at checkout",
       "inStock": true,
       "deliverable": null,
       "cod": null,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T06:03:31.778Z",
+      "verifiedAt": "2026-11-20T06:35:33.205Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -425,7 +381,7 @@
       "product": "galaxy-s25",
       "productName": "Galaxy S25 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-20T06:03:58.953Z",
+      "checkedAt": "2026-11-20T06:35:59.964Z",
       "status": "ok",
       "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537",
       "title": "Samsung Galaxy S25 5G Snapdragon (Navy, 256 GB) (12 GB RAM)",
@@ -475,7 +431,7 @@
       "deliverable": null,
       "cod": false,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-20T06:03:58.953Z",
+      "verifiedAt": "2026-11-20T06:35:59.964Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
