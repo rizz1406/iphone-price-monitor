@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-26T03:24:38.395Z",
+  "updatedAt": "2026-11-26T03:58:24.344Z",
   "pincode": "500055",
   "sites": [
     {
@@ -7,7 +7,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T03:20:54.402Z",
+      "checkedAt": "2026-11-26T03:54:26.965Z",
       "status": "error",
       "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
       "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH"
@@ -17,7 +17,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Croma",
-      "checkedAt": "2026-11-26T03:21:20.136Z",
+      "checkedAt": "2026-11-26T03:54:52.564Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -41,7 +41,7 @@
       "deliverable": false,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T03:21:20.136Z",
+      "verifiedAt": "2026-11-26T03:54:52.564Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -71,7 +71,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-26T03:21:39.930Z",
+      "checkedAt": "2026-11-26T03:55:17.225Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
@@ -153,7 +153,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T03:21:39.930Z",
+      "verifiedAt": "2026-11-26T03:55:17.225Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -181,7 +181,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Amazon",
-      "checkedAt": "2026-11-26T03:21:54.588Z",
+      "checkedAt": "2026-11-26T03:55:40.889Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0FQFYXCC4",
       "title": "Apple iPhone 17 256 GB: 15.93 cm (6.3″) Display with Promotion, A19 Chip, Center Stage Front Camera for Smarter Group Selfies, Improved Scratch Resistance, All-Day Battery Life; Black",
@@ -205,7 +205,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T03:21:54.588Z",
+      "verifiedAt": "2026-11-26T03:55:40.889Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": false,
@@ -235,7 +235,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Reliance Digital",
-      "checkedAt": "2026-11-26T03:22:11.082Z",
+      "checkedAt": "2026-11-26T03:55:57.044Z",
       "status": "error",
       "error": "Could not extract Reliance Digital price",
       "url": "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645"
@@ -245,7 +245,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Apple India",
-      "checkedAt": "2026-11-26T03:22:16.862Z",
+      "checkedAt": "2026-11-26T03:56:02.855Z",
       "status": "ok",
       "url": "https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-mist-blue",
       "title": "Buy iPhone 17 256GB Mist Blue - Apple (IN)",
@@ -282,7 +282,7 @@
       "deliverable": null,
       "cod": false,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-26T03:22:16.862Z",
+      "verifiedAt": "2026-11-26T03:56:02.855Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -312,7 +312,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T03:23:23.121Z",
+      "checkedAt": "2026-11-26T03:57:09.155Z",
       "status": "error",
       "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
       "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E"
@@ -322,7 +322,7 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Amazon",
-      "checkedAt": "2026-11-26T03:23:31.900Z",
+      "checkedAt": "2026-11-26T03:57:17.953Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0GL87VP7N",
       "title": "Samsung Galaxy S26 5G (Cobalt Violet, 12GB RAM, 256GB Storage), AI Phone, Photo Assist, Creative Studio, 50MP Camera with ProVisual Engine, Powerful Customized Processor and 4300mAh Battery",
@@ -346,7 +346,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T03:23:31.900Z",
+      "verifiedAt": "2026-11-26T03:57:17.953Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -372,7 +372,7 @@
       "product": "galaxy-s25",
       "productName": "Galaxy S25 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T03:24:38.328Z",
+      "checkedAt": "2026-11-26T03:58:24.267Z",
       "status": "error",
       "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
       "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537"
