@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-26T07:12:00.543Z",
+  "updatedAt": "2026-11-26T07:43:29.405Z",
   "pincode": "500055",
   "sites": [
     {
@@ -7,17 +7,133 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T07:08:02.171Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
-      "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH"
+      "checkedAt": "2026-11-26T07:40:59.079Z",
+      "status": "ok",
+      "url": "https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH",
+      "title": "Apple iPhone 17 (Mist Blue, 256 GB)",
+      "mrp": null,
+      "listPrice": 89100,
+      "checkoutPrice": 89100,
+      "effectivePrice": 89100,
+      "maxBankOffer": 4000,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000
+        },
+        {
+          "bank": "ICICI",
+          "amount": 1101
+        },
+        {
+          "bank": "HDFC",
+          "amount": 891
+        },
+        {
+          "bank": "SBI",
+          "amount": 891
+        },
+        {
+          "bank": "Axis",
+          "amount": 891
+        }
+      ],
+      "bankOffersDetailed": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "ICICI",
+          "amount": 1101,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "HDFC",
+          "amount": 891,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "SBI",
+          "amount": 891,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "Axis",
+          "amount": 891,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        }
+      ],
+      "bankOfferKind": "instant",
+      "qualifiedPrice": null,
+      "exchangeCeiling": 65750,
+      "exchangeAvailable": true,
+      "assumedExchangeValue": 5000,
+      "exchangeAdjustedPrice": 84100,
+      "seller": "Vision Star",
+      "delivery": "Saturday, 28 Nov",
+      "deliveryNote": null,
+      "inStock": true,
+      "deliverable": true,
+      "cod": false,
+      "pincodeSet": true,
+      "verifiedAt": "2026-11-26T07:40:59.079Z",
+      "identity": {
+        "storageMatch": true,
+        "colorMatch": true,
+        "verified": true
+      },
+      "purchase": {
+        "purchasable": true,
+        "blockers": [],
+        "price": 89100,
+        "tier": {
+          "tier": "WAIT",
+          "label": "WAIT",
+          "target": {
+            "buyNow": 79900,
+            "strongDealMax": 82900,
+            "watchMax": 87900,
+            "excellentCheckout": 76900,
+            "qualifiedBankPrice": 74900
+          }
+        }
+      }
     },
     {
       "site": "croma",
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Croma",
-      "checkedAt": "2026-11-26T07:08:27.279Z",
+      "checkedAt": "2026-11-26T07:41:24.915Z",
       "status": "ok",
       "url": "https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400",
       "title": "Apple iPhone 17 (256GB, Mist Blue)",
@@ -41,7 +157,7 @@
       "deliverable": false,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T07:08:27.279Z",
+      "verifiedAt": "2026-11-26T07:41:24.915Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -71,7 +187,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Vijay Sales",
-      "checkedAt": "2026-11-26T07:08:52.440Z",
+      "checkedAt": "2026-11-26T07:41:50.048Z",
       "status": "ok",
       "url": "https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue",
       "title": "Apple iPhone 17 (256GB Storage, Mist Blue)",
@@ -153,7 +269,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T07:08:52.440Z",
+      "verifiedAt": "2026-11-26T07:41:50.048Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -181,7 +297,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Amazon",
-      "checkedAt": "2026-11-26T07:09:17.267Z",
+      "checkedAt": "2026-11-26T07:42:13.669Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0FQFYXCC4",
       "title": "Apple iPhone 17 256 GB: 15.93 cm (6.3″) Display with Promotion, A19 Chip, Center Stage Front Camera for Smarter Group Selfies, Improved Scratch Resistance, All-Day Battery Life; Black",
@@ -205,7 +321,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T07:09:17.267Z",
+      "verifiedAt": "2026-11-26T07:42:13.669Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": false,
@@ -235,7 +351,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Reliance Digital",
-      "checkedAt": "2026-11-26T07:09:33.413Z",
+      "checkedAt": "2026-11-26T07:42:30.130Z",
       "status": "error",
       "error": "Could not extract Reliance Digital price",
       "url": "https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645"
@@ -245,7 +361,7 @@
       "product": "iphone17",
       "productName": "iPhone 17 256GB Mist Blue",
       "name": "Apple India",
-      "checkedAt": "2026-11-26T07:09:39.193Z",
+      "checkedAt": "2026-11-26T07:42:36.109Z",
       "status": "ok",
       "url": "https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-mist-blue",
       "title": "Buy iPhone 17 256GB Mist Blue - Apple (IN)",
@@ -282,7 +398,7 @@
       "deliverable": null,
       "cod": false,
       "pincodeSet": false,
-      "verifiedAt": "2026-11-26T07:09:39.193Z",
+      "verifiedAt": "2026-11-26T07:42:36.109Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": true,
@@ -312,17 +428,85 @@
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T07:10:45.611Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
-      "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E"
+      "checkedAt": "2026-11-26T07:42:53.250Z",
+      "status": "ok",
+      "url": "https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E",
+      "title": "Samsung Galaxy S26 5G (White, 256 GB) (12 GB RAM)",
+      "mrp": null,
+      "listPrice": 87999,
+      "checkoutPrice": 87999,
+      "effectivePrice": 87999,
+      "maxBankOffer": 4000,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000
+        }
+      ],
+      "bankOffersDetailed": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 4000,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 4000,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        }
+      ],
+      "bankOfferKind": "instant",
+      "qualifiedPrice": null,
+      "exchangeCeiling": 65750,
+      "exchangeAvailable": false,
+      "assumedExchangeValue": 0,
+      "exchangeAdjustedPrice": null,
+      "seller": "BTPLD",
+      "delivery": null,
+      "deliveryNote": null,
+      "inStock": true,
+      "deliverable": false,
+      "cod": false,
+      "pincodeSet": true,
+      "verifiedAt": "2026-11-26T07:42:53.250Z",
+      "identity": {
+        "storageMatch": true,
+        "colorMatch": null,
+        "verified": true
+      },
+      "purchase": {
+        "purchasable": false,
+        "blockers": [
+          "NOT_DELIVERABLE"
+        ],
+        "price": 87999,
+        "tier": {
+          "tier": "WAIT",
+          "label": "WAIT",
+          "target": {
+            "buyNow": 79900,
+            "strongDealMax": 84900,
+            "watchMax": 87900
+          }
+        }
+      }
     },
     {
       "site": "amazon",
       "product": "galaxy-s26",
       "productName": "Galaxy S26 256GB",
       "name": "Amazon",
-      "checkedAt": "2026-11-26T07:10:54.184Z",
+      "checkedAt": "2026-11-26T07:43:02.348Z",
       "status": "ok",
       "url": "https://www.amazon.in/dp/B0GL87VP7N",
       "title": "Samsung Galaxy S26 5G (Cobalt Violet, 12GB RAM, 256GB Storage), AI Phone, Photo Assist, Creative Studio, 50MP Camera with ProVisual Engine, Powerful Customized Processor and 4300mAh Battery",
@@ -346,7 +530,7 @@
       "deliverable": true,
       "cod": null,
       "pincodeSet": true,
-      "verifiedAt": "2026-11-26T07:10:54.184Z",
+      "verifiedAt": "2026-11-26T07:43:02.348Z",
       "identity": {
         "storageMatch": true,
         "colorMatch": null,
@@ -372,10 +556,78 @@
       "product": "galaxy-s25",
       "productName": "Galaxy S25 256GB",
       "name": "Flipkart",
-      "checkedAt": "2026-11-26T07:12:00.471Z",
-      "status": "error",
-      "error": "Could not extract Flipkart price (page may be bot-walled or not fully loaded)",
-      "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537"
+      "checkedAt": "2026-11-26T07:43:29.237Z",
+      "status": "ok",
+      "url": "https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537",
+      "title": "Samsung Galaxy S25 5G Snapdragon (Navy, 256 GB) (12 GB RAM)",
+      "mrp": null,
+      "listPrice": 64999,
+      "checkoutPrice": 64999,
+      "effectivePrice": 64999,
+      "maxBankOffer": 3250,
+      "bankOffers": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 3250
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 3250
+        }
+      ],
+      "bankOffersDetailed": [
+        {
+          "bank": "Flipkart Axis",
+          "amount": 3250,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        },
+        {
+          "bank": "Flipkart SBI",
+          "amount": 3250,
+          "minTxn": null,
+          "eligibility": "unknown",
+          "verified": false,
+          "expires": null
+        }
+      ],
+      "bankOfferKind": "instant",
+      "qualifiedPrice": null,
+      "exchangeCeiling": 55200,
+      "exchangeAvailable": true,
+      "assumedExchangeValue": 0,
+      "exchangeAdjustedPrice": null,
+      "seller": "Truenet Commerce",
+      "delivery": "Tomorrow, 11 PM",
+      "deliveryNote": "pincode 500055 not confirmed on page",
+      "inStock": true,
+      "deliverable": null,
+      "cod": false,
+      "pincodeSet": false,
+      "verifiedAt": "2026-11-26T07:43:29.237Z",
+      "identity": {
+        "storageMatch": true,
+        "colorMatch": null,
+        "verified": true
+      },
+      "purchase": {
+        "purchasable": false,
+        "blockers": [
+          "DELIVERY_UNVERIFIED"
+        ],
+        "price": 64999,
+        "tier": {
+          "tier": "STRONG_DEAL",
+          "label": "STRONG DEAL",
+          "target": {
+            "buyNow": 64900,
+            "strongDealMax": 69900,
+            "watchMax": 72900
+          }
+        }
+      }
     }
   ]
 }
