@@ -1,19 +1,19 @@
 # iPhone Price Monitor
-**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹79,900 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 26 Nov 2026, 7:17 am IST
+**Primary target:** iPhone 17 256GB Mist Blue ≤ ₹79,900 checkout (no exchange) | **Pincode:** `500055` | **Updated:** 26 Nov 2026, 7:49 am IST
 
 ## iPhone 17 256GB Mist Blue
 
 | Site | Tier | Buyable | Checkout | M.R.P. | Bank offer (unverified) | Delivery | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | WAIT ★ | ✅ Yes | **₹89,100** | — | ₹4,000 | Saturday, 28 Nov | 26 Nov 2026, 7:15 am |
-| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ✅ Yes | **₹93,990** | ₹99,900 | ₹5,000 | Tomorrow | 26 Nov 2026, 7:16 am |
-| [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | STRONG DEAL | ❌ won't deliver to 500055 | **₹82,900** | — | — | Not available for 500055 | 26 Nov 2026, 7:15 am |
-| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ not the Mist Blue colour | **₹93,990** | ₹99,900 | — | 28 November - 6 December | 26 Nov 2026, 7:16 am |
-| [**Apple India**](https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-mist-blue) | WAIT | ❌ delivery to 500055 could not be verified | **₹99,900** | ₹99,900 | ₹7,000 | Shown during checkout | 26 Nov 2026, 7:16 am |
+| [**Flipkart**](https://www.flipkart.com/apple-iphone-17-mist-blue-256-gb/p/itmfd8c16e287599?pid=MOBHQV9YNVS7PXHH) | WAIT ★ | ✅ Yes | **₹89,100** | — | ₹4,000 | Saturday, 28 Nov | 26 Nov 2026, 7:46 am |
+| [**Vijay Sales**](https://www.vijaysales.com/p/P261226/261228/apple-iphone-17-256gb-storage-mist-blue) | WAIT | ✅ Yes | **₹93,990** | ₹99,900 | ₹5,000 | Tomorrow | 26 Nov 2026, 7:47 am |
+| [**Croma**](https://www.croma.com/apple-iphone-17-256gb-mist-blue-/p/317400) | STRONG DEAL | ❌ won't deliver to 500055 | **₹82,900** | — | — | Not available for 500055 | 26 Nov 2026, 7:47 am |
+| [**Amazon**](https://www.amazon.in/dp/B0FQFYXCC4) | WAIT | ❌ not the Mist Blue colour | **₹93,990** | ₹99,900 | — | 28 November - 6 December | 26 Nov 2026, 7:48 am |
+| [**Apple India**](https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-mist-blue) | WAIT | ❌ delivery to 500055 could not be verified | **₹99,900** | ₹99,900 | ₹7,000 | Shown during checkout | 26 Nov 2026, 7:48 am |
 | [**Reliance Digital**](https://www.reliancedigital.in/product/apple-iphone-17-256-gb-mist-blue-mff8s5-9391645) | — | ❌ Error | last known: see dashboard | — | — | — | — |
 
 ### Forecast
-- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 245 over 7 unique days
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 246 over 7 unique days
 - Basis: verified **Flipkart** checkout prices only (stores that cannot deliver are excluded)
 - Only 7 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
 - Lowest verified since tracking began: **₹89,100** at Flipkart (20 Nov 2026) — ₹9,200 above target
@@ -36,11 +36,11 @@
 
 | Site | Tier | Buyable | Checkout | M.R.P. | Bank offer (unverified) | Delivery | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT ★ | ✅ Yes | **₹1,02,999** | ₹1,17,999 | — | Saturday, 28 November. Details | 26 Nov 2026, 7:17 am |
-| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | WAIT | ❌ won't deliver to 500055 | **₹87,999** | — | ₹4,000 | — | 26 Nov 2026, 7:17 am |
+| [**Amazon**](https://www.amazon.in/dp/B0GL87VP7N) | WAIT ★ | ✅ Yes | **₹1,02,999** | ₹1,17,999 | — | Saturday, 28 November. Details | 26 Nov 2026, 7:49 am |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s26-5g-white-256-gb/p/itm0ca5d0430e1c1?pid=MOBHKGAPH5JGKK3E) | WAIT | ❌ won't deliver to 500055 | **₹87,999** | — | ₹4,000 | — | 26 Nov 2026, 7:48 am |
 
 ### Forecast
-- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 253 over 7 unique days
+- Level: **ILLUSTRATIVE ONLY** · Confidence: **LOW** · Observations: 254 over 7 unique days
 - Basis: verified **Amazon** checkout prices only (stores that cannot deliver are excluded)
 - Only 7 days of usable history (need 14+). The ranges below are illustrative, not a forecast.
 - Lowest verified since tracking began: **₹87,999** at Amazon (20 Nov 2026) — ₹8,099 above target
@@ -57,7 +57,7 @@
 
 | Site | Tier | Buyable | Checkout | M.R.P. | Bank offer (unverified) | Delivery | Verified (IST) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | STRONG DEAL | ❌ delivery to 500055 could not be verified | **₹64,999** | — | ₹3,250 | Tomorrow, 11 PM | 26 Nov 2026, 7:17 am |
+| [**Flipkart**](https://www.flipkart.com/samsung-galaxy-s25-5g-snapdragon-navy-256-gb/p/itm21a6fef66d537) | STRONG DEAL | ❌ delivery to 500055 could not be verified | **₹64,999** | — | ₹3,250 | Tomorrow, 11 PM | 26 Nov 2026, 7:49 am |
 
 ### Forecast
 - Level: **INSUFFICIENT DATA** · Confidence: **LOW** · Observations: 1 over 1 unique days
